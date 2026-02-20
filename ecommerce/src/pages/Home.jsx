@@ -5,7 +5,7 @@ function App() {
     <div>
         <Header/>
         <text>fdvdfvdbvdfbvdvbdfvdfbvvvvvvvvvvvvvv
-            fddf
+            f
             fd
             dfd
             fd
