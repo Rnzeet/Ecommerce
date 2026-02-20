@@ -1,0 +1,113 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.nav-links {
+  display:flex;
+  list-style: none;
+  gap: 30px;
+  font-size: 25px;
+
+
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #1f2937;
+  color: white;
+  padding: 15px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* */
+
+.nav-links li {
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.nav-links li:hover {
+  color: #facc15;
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.search {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: none;
+}
+
+.cart {
+  position: relative;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
+
+.login-btn {
+  padding: 6px 12px;
+  background-color: #facc15;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.menu-icon {
+  display: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* 📱 Mobile View */
+@media (max-width: 768px) {
+  .nav {
+    position: absolute;
+    top: 70px;
+    left: -100%;
+    width: 100%;
+    background-color: #1f2937;
+    transition: 0.3s;
+  }
+
+  .nav.active {
+    left: 0;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .menu-icon {
+    display: block;
+  }
+}
