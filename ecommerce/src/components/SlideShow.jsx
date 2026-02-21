@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "./Slideshow.css";
+import "./SlideShow.css";
 
 import banner1 from "../assets/image3.jpg";
 import banner2 from "../assets/image2.jpg";
