@@ -1,17 +1,28 @@
-import Header from "../components/Header";
 
-function App() {
+import { Outlet } from "react-router-dom";
+import Header from "../components/Header";
+import Layout from "../components/Layout";
+import Slideshow from "../components/SlideShow";
+import ProductCard from "../components/Products";
+import ProductList from "../components/ProductList";
+import Footer from "../components/Footer";
+
+
+
+function Home() {
   return (
-    <div>
-        <Header/>
-        <text>fdvdfvdbvdfbvdvbdfvdfbvvvvvvvvvvvvvv
-            fddf
-            fd
-            dfd
-            fd
-        </text>
-    </div>
+    <>
+      <Layout/>
+      {/* <Outlet /> */}
+  
+      <div style={{ marginTop: "80px",width:"100%" }}>
+<ProductList/>
+      </div>
+      <div>
+        <Footer/>
+      </div>
+    </>
   );
 }
 
-export default App;
+export default Home;
