@@ -19,7 +19,7 @@ function Layout() {
   }}>
         The Best is Here..!!!!
       </div>
-      <div style={{ width:'100vw',paddingLeft:"2%",paddingRight:"2"}}>
+      <div style={{ width:'100vw',paddingLeft:"2%",paddingRight:"2%"}}>
     <Slideshow/>
     </div>
     </>
