@@ -17,9 +17,9 @@ function Layout() {
     color: "#ce1c2b",
     letterSpacing: "2px"
   }}>
-        The Best is Here..!!
+        The Best is Here..!!!!
       </div>
-      <div style={{ marginTop: "0px", width:'100vw'}}>
+      <div style={{ width:'100vw',paddingLeft:"50px",paddingRight:"50px"}}>
     <Slideshow/>
     </div>
     </>
