@@ -53,7 +53,9 @@ function Header() {
 
   return (
     <header className="header">
-      <div className="logo">MyStore</div>
+      <Link to="/" className="logo">
+        MyStore
+      </Link>
 
       <nav className={`nav ${menuOpen ? "active" : ""}`}>
         <ul className="nav-links">

@@ -110,4 +110,12 @@
   .menu-icon {
     display: block;
   }
+  .logo {
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+}
+
 }
