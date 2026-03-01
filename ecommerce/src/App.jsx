@@ -10,15 +10,17 @@ import Checkout from "./pages/Checkout";
 function App() {
   return (
     <>
-      {/* 👇 Header is now global */}
+      {/* Header stays fixed at top */}
       <Header />
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-
-      </Routes>
+      {/* Main content pushed below header */}
+      <main style={{ marginTop: "80px", padding: "0 10px" }}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+        </Routes>
+      </main>
 
       <ToastContainer 
         position="top-right"

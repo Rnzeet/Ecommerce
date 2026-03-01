@@ -26,6 +26,11 @@
     transform: rotate(360deg);
   }
 }
+@media (max-width: 768px) {
+  main {
+    margin-top: 100px; /* adjust for mobile header height */
+  }
+}
 
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
