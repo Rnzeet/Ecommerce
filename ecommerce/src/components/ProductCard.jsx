@@ -1,7 +1,7 @@
 
 import { useCart } from "../context/CartContext";
 import { toast } from "react-toastify";
-import "./ProductsCard.css"
+import "./ProductCard.css"
 function ProductCard({ product }) {
   const { addToCart } = useCart();
 
