@@ -2,6 +2,7 @@
 
 import Slideshow from "../components/SlideShow";
 import ProductList from "../components/ProductList";
+import Footer from "../components/Footer";
 
 function Home() {
   return (
@@ -12,7 +13,9 @@ function Home() {
 
       <div style={{ padding: "20px" }}>
         <ProductList />
+         
       </div>
+       <Footer />
     </>
   );
 }
