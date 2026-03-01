@@ -11,7 +11,7 @@ function Home() {
         <Slideshow />
       </div>
 
-      <div style={{ padding: "20px" }}>
+      <div >
         <ProductList />
          
       </div>
