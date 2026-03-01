@@ -40,6 +40,7 @@
 // export default ProductCard;
 
 import { useCart } from "../context/CartContext";
+import { toast } from "react-toastify";
 
 function ProductCard({ product }) {
   const { addToCart } = useCart();
@@ -50,10 +51,16 @@ function ProductCard({ product }) {
       <h3>{product.title}</h3>
       <p>{product.description}</p>
       <h4>₹{product.price}</h4>
-
-      <button onClick={() => addToCart(product)}>
+      <button
+        onClick={() => {
+          addToCart(product);
+          toast.success("Item added to cart 🛒");
+        }}
+      >
         Add to Cart
       </button>
+
+
     </div>
   );
 }
