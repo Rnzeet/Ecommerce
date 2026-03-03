@@ -24,12 +24,13 @@ function Home() {
       </div>
 
       <section>
-        <h2>Featured Products</h2>
+        <h2 style={{ color: "white" }}>Featured Products</h2>
         <ProductList />
       </section>
+ 
 
       <section className="categories">
-        <h2>Shop by Category</h2>
+        <h2 style={{ color: "white" }}>Shop by Category</h2>
         <div className="categories">
           {categories.map((cat, i) => (
             <div key={i} className="category-card">
@@ -41,7 +42,7 @@ function Home() {
       </section>
 
       <section className="about">
-        <h2>Why Choose MyStore?</h2>
+        <h2 style={{ color: "white" }}>Why Choose MyStore?</h2>
         <p style={{ maxWidth: "600px", margin: "10px auto", lineHeight: "1.6", textAlign: "center" }}>
           We provide the finest quality teas sourced from the best gardens.
           Enjoy a wide range of flavors and blends that bring comfort and wellness to your day.
@@ -49,7 +50,7 @@ function Home() {
       </section>
 
       <section className="testimonials">
-        <h2>What Our Customers Say</h2>
+        <h2 style={{ color: "white" }}>What Our Customers Say</h2>
         <div className="testimonials">
           {testimonials.map((t, i) => (
             <div key={i} className="testimonial-card">

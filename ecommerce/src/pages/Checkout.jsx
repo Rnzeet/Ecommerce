@@ -1,7 +1,7 @@
 import { useCart } from "../context/CartContext";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import "./Checkout.css";
+ import "./Checkout.css";
 
 function Checkout() {
   const { cart, totalPrice, clearCart } = useCart();
@@ -35,41 +35,69 @@ function Checkout() {
   };
 
   return (
+  <div className="checkout-wrapper">
     <div className="checkout-container">
-      <h2>Checkout</h2>
 
-      <h3>Total: ₹{totalPrice}</h3>
+      {/* Left Side - Form */}
+      <div className="checkout-form">
+        <h2>Checkout</h2>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Full Name"
-          required
-          onChange={handleChange}
-        />
+        <form onSubmit={handleSubmit}>
+          <label>Full Name</label>
+          <input
+            type="text"
+            name="name"
+            placeholder="Enter your full name"
+            required
+            onChange={handleChange}
+          />
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          required
-          onChange={handleChange}
-        />
+          <label>Email</label>
+          <input
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            required
+            onChange={handleChange}
+          />
 
-        <textarea
-          name="address"
-          placeholder="Delivery Address"
-          required
-          onChange={handleChange}
-        />
+          <label>Delivery Address</label>
+          <textarea
+            name="address"
+            placeholder="Enter delivery address"
+            required
+            onChange={handleChange}
+          />
 
-        <button type="submit">
-          Place Order
-        </button>
-      </form>
+          <button type="submit" className="place-order-btn">
+            Place Order
+          </button>
+        </form>
+      </div>
+
+      {/* Right Side - Order Summary */}
+      <div className="checkout-summary">
+        <h3>Order Summary</h3>
+
+        {cart.map((item) => (
+          <div key={item.id} className="summary-item">
+            <span>{item.title} x {item.quantity}</span>
+            <span>₹{item.price * item.quantity}</span>
+          </div>
+        ))}
+
+        <hr />
+
+        <div className="summary-total">
+          <h3>Total</h3>
+          <h3>₹{totalPrice}</h3>
+        </div>
+      </div>
+
     </div>
-  );
+  </div>
+);
+
 }
 
 export default Checkout;
