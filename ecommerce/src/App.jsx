@@ -7,6 +7,7 @@ import Cart from "./pages/Cart";
 import Header from "./components/Header";
 import Checkout from "./pages/Checkout";
 import Products from "./pages/Products";
+import Admin from "./pages/Admin";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
            <Route path="/products" element={<Products />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
+            <Route path="/admin" element={<Admin/>} />
         </Routes>
       </main>
 
