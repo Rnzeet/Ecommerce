@@ -1,15 +1,37 @@
-console.log("Starting My Tea Store Backend...");
-
 const express = require("express");
-const cors = require("cors");
+const supabase = require("./config/supabase"); // make sure this exports the client
+require('dotenv').config();
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Backend Running Successfully 🚀");
+// Add product
+app.post("/add-product", async (req, res) => {
+  const { name, price, image } = req.body;
+
+  const { data, error } = await supabase
+    .from("products")
+    .insert([{ name, price, image }]);
+
+  if (error) {
+    return res.status(400).json(error);
+  }
+
+  res.json(data);
+});
+
+// Get products
+app.get("/products", async (req, res) => {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*");
+
+  if (error) {
+    return res.status(400).json(error);
+  }
+
+  res.json(data);
 });
 
 app.listen(5000, () => {
