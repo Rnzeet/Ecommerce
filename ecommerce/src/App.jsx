@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -8,31 +8,49 @@ import Header from "./components/Header";
 import Checkout from "./pages/Checkout";
 import Products from "./pages/Products";
 import Admin from "./pages/Admin";
+import AdminLogin from "./pages/AdminLogin";
+import ProtectedRoute from "./components/ProtectedRoute";
 
-function App() {
+// Hide header on admin pages
+function AppContent() {
+  const location = useLocation();
+  const isAdminPage =
+    location.pathname === "/admin" || location.pathname === "/admin-login";
+
   return (
     <>
-      {/* Header stays fixed at top */}
-      <Header />
+      {/* Hide header on admin pages */}
+      {!isAdminPage && <Header />}
 
-      {/* Main content pushed below header */}
-      <main style={{ marginTop: "80px", padding: "0 10px" }}>
+      <main style={{ marginTop: isAdminPage ? "0" : "80px", padding: "0 10px" }}>
         <Routes>
           <Route path="/" element={<Home />} />
-           <Route path="/products" element={<Products />} />
+          <Route path="/products" element={<Products />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
-            <Route path="/admin" element={<Admin/>} />
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
 
-      <ToastContainer 
+      <ToastContainer
         position="top-right"
         autoClose={2000}
         theme="colored"
       />
     </>
   );
+}
+
+function App() {
+  return <AppContent />;
 }
 
 export default App;

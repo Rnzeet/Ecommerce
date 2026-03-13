@@ -1,0 +1,102 @@
+.admin-container{
+  display:flex;
+  height:100vh;
+  font-family:Arial;
+}
+
+/* Sidebar */
+
+.sidebar{
+  width:220px;
+  background:#111;
+  color:white;
+  padding:20px;
+}
+
+.sidebar h2{
+  margin-bottom:30px;
+}
+
+.sidebar ul{
+  list-style:none;
+  padding:0;
+}
+
+.sidebar li{
+  padding:12px 0;
+  cursor:pointer;
+  opacity:0.8;
+}
+
+.sidebar li.active{
+  opacity:1;
+  font-weight:bold;
+}
+
+/* Main */
+
+.main{
+  flex:1;
+  padding:30px;
+  background:#f4f6f9;
+}
+
+.header{
+  margin-bottom:20px;
+}
+
+/* Cards */
+
+.card{
+  background:white;
+  padding:20px;
+  border-radius:8px;
+  margin-bottom:25px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* Form */
+
+.card input,
+.card textarea{
+  width:100%;
+  margin:8px 0;
+  padding:10px;
+  border:1px solid #ddd;
+  border-radius:5px;
+}
+
+.card button{
+  margin-top:10px;
+  padding:10px 15px;
+  border:none;
+  background:#2c7be5;
+  color:white;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+/* Table */
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th, td{
+  padding:12px;
+  border-bottom:1px solid #eee;
+}
+
+img{
+  width:50px;
+  border-radius:5px;
+}
+
+.delete-btn{
+  background:#ff4d4d;
+  padding:6px 10px;
+  border:none;
+  color:white;
+  border-radius:4px;
+}
