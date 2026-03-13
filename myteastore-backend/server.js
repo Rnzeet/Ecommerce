@@ -1,15 +1,21 @@
-require('dotenv').config();
+
+require("dotenv").config();
+
 const express = require("express");
+const cors = require("cors");
 const adminRoutes = require("./models/admin");
 
 const app = express();
+
+app.use(cors());
 app.use(express.json());
 
-app.use("/admin", adminRoutes); // <- now works because adminRoutes is a router
+app.use("/admin", adminRoutes);
 
 app.get("/", (req, res) => {
   res.send("MyTeaStore API Running");
 });
 
-const PORT = 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(5000, () => {
+  console.log("Server running on port 5000");
+});
