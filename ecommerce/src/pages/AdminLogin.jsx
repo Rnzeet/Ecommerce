@@ -5,9 +5,12 @@ import "./AdminLogin.css";
 // Hardcoded admin credentials (can be replaced with backend auth later)
 // const ADMIN_USERNAME = "admin";
 // const ADMIN_PASSWORD = "admin123";
-const ADMIN_USERNAME=import.meta.env.REACT_APP_ADMIN_LOGIN;
-const ADMIN_PASSWORD=import.meta.env.REACT_APP_ADMIN_PASS;
+const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_LOGIN;
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASS;
 
+console.log(ADMIN_USERNAME, ADMIN_PASSWORD);
+
+console.log(ADMIN_USERNAME, ADMIN_PASSWORD);
 function AdminLogin() {
   const navigate = useNavigate();
 
