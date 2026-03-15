@@ -19,13 +19,18 @@ object-fit: cover;   /* ✅ This makes image fill properly */
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(0,0,0,0.5);
+  background: rgba(27, 94, 32, 0.7); /* Brand green transparent */
   color: white;
   border: none;
-  font-size: 30px;
-  padding: 10px 15px;
+  font-size: 24px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   border-radius: 50%;
+  transition: background 0.3s ease;
 }
 
 .left {
@@ -37,13 +42,13 @@ object-fit: cover;   /* ✅ This makes image fill properly */
 }
 
 .arrow:hover {
-  background: rgba(0,0,0,0.8);
+  background: rgba(27, 94, 32, 0.9);
 }
 
 /* Dots */
 .dots {
   position: absolute;
-  bottom: 10px;
+  bottom: 15px;
   width: 100%;
   text-align: center;
 }
@@ -52,16 +57,18 @@ object-fit: cover;   /* ✅ This makes image fill properly */
   height: 12px;
   width: 12px;
   margin: 0 6px;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.6);
+  border: 2px solid transparent;
   border-radius: 50%;
   display: inline-block;
   cursor: pointer;
-  opacity: 0.5;
+  transition: all 0.3s ease;
 }
 
 .dot.active {
-  opacity: 1;
-  background-color: #facc15;
+  background-color: #FCEFD4; /* Brand Gold/Beige */
+  border: 2px solid #1B5E20; /* Brand green outline */
+  transform: scale(1.2); /* Slightly enlarges the active dot */
 }
 @media (max-width: 992px) {
   .slideshow {
