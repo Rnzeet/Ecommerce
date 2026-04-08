@@ -1,21 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./AdminLogin.css";
 
-// Hardcoded admin credentials (can be replaced with backend auth later)
-// const ADMIN_USERNAME = "admin";
-// const ADMIN_PASSWORD = "admin123";
-const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_LOGIN;
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASS;
+const API = import.meta.env.VITE_API_URL || "https://ecommerce-19y4.onrender.com";
 
-console.log(ADMIN_USERNAME, ADMIN_PASSWORD);
-
-console.log(ADMIN_USERNAME, ADMIN_PASSWORD);
 function AdminLogin() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
@@ -23,17 +18,21 @@ function AdminLogin() {
     setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (
-      form.username === ADMIN_USERNAME &&
-      form.password === ADMIN_PASSWORD
-    ) {
+    setLoading(true);
+    try {
+      const res = await axios.post(`${API}/auth/login`, {
+        email: form.username,
+        password: form.password,
+      });
       localStorage.setItem("isAdminLoggedIn", "true");
+      localStorage.setItem("adminToken", res.data.token);
       navigate("/admin");
-    } else {
+    } catch (err) {
       setError("❌ Invalid username or password");
+    } finally {
+      setLoading(false);
     }
   };
 
