@@ -3,14 +3,14 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-const adminRoutes = require("./models/admin");
+const productRoutes = require("./routes/productRoutes");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.use("/admin", adminRoutes);
+app.use("/api/products", productRoutes);
 
 app.get("/", (req, res) => {
   res.send("MyTeaStore API Running");

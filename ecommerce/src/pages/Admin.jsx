@@ -88,6 +88,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+const API = import.meta.env.VITE_API_URL || "https://ecommerce-19y4.onrender.com";
 
 function Admin() {
   const navigate = useNavigate();
@@ -105,10 +106,11 @@ const [editId, setEditId] = useState(null);
     image: "",
      category: "",
      description: "",
+    imageName: "",
   });
 
   const fetchProducts = async () => {
-    const res = await axios.get("http://localhost:5000/admin/products");
+    const res = await axios.get(`${API}/api/products`);
     setProducts(res.data);
   };
 
@@ -120,23 +122,27 @@ const [editId, setEditId] = useState(null);
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setForm((prev) => ({ ...prev, image: reader.result, imageName: file.name }));
+    };
+    reader.readAsDataURL(file);
+  };
+
 const handleAdd = async () => {
 
   if (editId) {
 
-    await axios.put(
-      `http://localhost:5000/admin/update-product/${editId}`,
-      form
-    );
+    await axios.put(`${API}/api/products/update-product/${editId}`, form);
 
     setEditId(null);
 
   } else {
 
-    await axios.post(
-      "http://localhost:5000/admin/add-product",
-      form
-    );
+    await axios.post(`${API}/api/products/add-product`, form);
 
   }
 
@@ -145,7 +151,8 @@ const handleAdd = async () => {
     price: "",
     image: "",
      category: "",
-     description: ""
+     description: "",
+    imageName: "",
   });
 
   fetchProducts();
@@ -153,7 +160,7 @@ const handleAdd = async () => {
 
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/admin/delete-product/${id}`);
+    await axios.delete(`${API}/api/products/delete-product/${id}`);
     fetchProducts();
   };
 
@@ -213,12 +220,12 @@ const handleAdd = async () => {
             onChange={handleChange}
           />
 
-          <input
-            name="image"
-            placeholder="Image URL"
-            value={form.image}
-            onChange={handleChange}
-          />
+          <div>
+            <input type="file" accept="image/*" onChange={handleFileChange} />
+            {form.imageName && (
+              <div style={{ marginTop: 8,color:'red' }} className="file-name">{form.imageName}</div>
+            )}
+          </div>
 
           <input
             name="category"
