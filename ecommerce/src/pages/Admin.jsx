@@ -36,14 +36,24 @@ const [editId, setEditId] = useState(null);
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleFileChange = (e) => {
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileChange = async (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      setForm((prev) => ({ ...prev, image: reader.result, imageName: file.name }));
-    };
-    reader.readAsDataURL(file);
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await axios.post(`${API}/api/products/upload-image`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setForm((prev) => ({ ...prev, image: res.data.url, imageName: file.name }));
+    } catch (err) {
+      alert("Image upload failed. Check Supabase Storage bucket exists.");
+    } finally {
+      setUploading(false);
+    }
   };
 
 const handleAdd = async () => {
@@ -135,9 +145,10 @@ const handleAdd = async () => {
           />
 
           <div>
-            <input type="file" accept="image/*" onChange={handleFileChange} />
-            {form.imageName && (
-              <div style={{ marginTop: 8,color:'red' }} className="file-name">{form.imageName}</div>
+            <input type="file" accept="image/*" onChange={handleFileChange} disabled={uploading} />
+            {uploading && <div style={{ marginTop: 8, color: '#2c7be5' }} className="file-name">⏳ Uploading...</div>}
+            {!uploading && form.imageName && (
+              <div style={{ marginTop: 8, color: '#2ecc71' }} className="file-name">✅ {form.imageName}</div>
             )}
           </div>
 
@@ -159,14 +170,15 @@ const handleAdd = async () => {
 
        <button
   onClick={handleAdd}
+  disabled={uploading}
   style={{
     marginTop: "10px",
-    background: "#2ecc71",
+    background: uploading ? "#aaa" : "#2ecc71",
     border: "none",
     padding: "10px 18px",
     color: "white",
     borderRadius: "6px",
-    cursor: "pointer",
+    cursor: uploading ? "not-allowed" : "pointer",
   }}
 >
   {editId ? "Update Product" : "Add Product"}
