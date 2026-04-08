@@ -37,49 +37,55 @@ const [editId, setEditId] = useState(null);
   };
 
   const [uploading, setUploading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
 
-  const handleFileChange = async (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("image", file);
-      const res = await axios.post(`${API}/api/products/upload-image`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      setForm((prev) => ({ ...prev, image: res.data.url, imageName: file.name }));
-    } catch (err) {
-      alert("Image upload failed. Check Supabase Storage bucket exists.");
-    } finally {
-      setUploading(false);
-    }
+    setImageFile(file);
+    setForm((prev) => ({ ...prev, imageName: file.name }));
   };
 
 const handleAdd = async () => {
+  setUploading(true);
+  try {
+    let imageUrl = form.image;
 
-  if (editId) {
+    // Upload new file if one was selected
+    if (imageFile) {
+      const formData = new FormData();
+      formData.append("image", imageFile);
+      const uploadRes = await axios.post(
+        `${API}/api/products/upload-image`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      imageUrl = uploadRes.data.url;
+    }
 
-    await axios.put(`${API}/api/products/update-product/${editId}`, form);
+    const payload = {
+      name: form.name,
+      price: form.price,
+      image: imageUrl,
+      category: form.category,
+      description: form.description,
+    };
 
-    setEditId(null);
+    if (editId) {
+      await axios.put(`${API}/api/products/update-product/${editId}`, payload);
+      setEditId(null);
+    } else {
+      await axios.post(`${API}/api/products/add-product`, payload);
+    }
 
-  } else {
-
-    await axios.post(`${API}/api/products/add-product`, form);
-
+    setForm({ name: "", price: "", image: "", category: "", description: "", imageName: "" });
+    setImageFile(null);
+    fetchProducts();
+  } catch (err) {
+    alert("Failed to save product. " + (err.response?.data?.message || err.message));
+  } finally {
+    setUploading(false);
   }
-
-  setForm({
-    name: "",
-    price: "",
-    image: "",
-     category: "",
-     description: "",
-    imageName: "",
-  });
-
-  fetchProducts();
 };
 
 
@@ -145,10 +151,9 @@ const handleAdd = async () => {
           />
 
           <div>
-            <input type="file" accept="image/*" onChange={handleFileChange} disabled={uploading} />
-            {uploading && <div style={{ marginTop: 8, color: '#2c7be5' }} className="file-name">⏳ Uploading...</div>}
-            {!uploading && form.imageName && (
-              <div style={{ marginTop: 8, color: '#2ecc71' }} className="file-name">✅ {form.imageName}</div>
+            <input type="file" accept="image/*" onChange={handleFileChange} />
+            {form.imageName && (
+              <div style={{ marginTop: 8, color: '#2c7be5' }} className="file-name">📎 {form.imageName}</div>
             )}
           </div>
 
@@ -181,7 +186,7 @@ const handleAdd = async () => {
     cursor: uploading ? "not-allowed" : "pointer",
   }}
 >
-  {editId ? "Update Product" : "Add Product"}
+  {uploading ? "⏳ Saving..." : editId ? "Update Product" : "Add Product"}
 </button>
 
       </div>
