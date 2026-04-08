@@ -10,7 +10,7 @@ const authRoutes = require("./models/auth");
 const app = express();
 
 app.use(cors({
-  origin: ["http://localhost:5173", "https://ecommerce-46mx.vercel.app"],
+  origin: (origin, callback) => callback(null, true),
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
 }));
