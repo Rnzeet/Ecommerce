@@ -3,18 +3,19 @@ const jwt = require("jsonwebtoken");
 
 const router = express.Router();
 
-const ADMIN_EMAIL = "admin@myteastore.com";
-const ADMIN_PASSWORD = "myteastore123";
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+const JWT_SECRET = process.env.JWT_SECRET || "myteastore_secret_key";
 
 router.post("/login", (req, res) => {
 
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
-  if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
 
     const token = jwt.sign(
-      { email: ADMIN_EMAIL },
-      "mysecretkey",
+      { username: ADMIN_USERNAME },
+      JWT_SECRET,
       { expiresIn: "1d" }
     );
 

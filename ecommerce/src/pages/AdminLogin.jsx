@@ -23,7 +23,7 @@ function AdminLogin() {
     setLoading(true);
     try {
       const res = await axios.post(`${API}/auth/login`, {
-        email: form.username,
+        username: form.username,
         password: form.password,
       });
       localStorage.setItem("isAdminLoggedIn", "true");
