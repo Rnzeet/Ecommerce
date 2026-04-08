@@ -12,7 +12,6 @@ function ProductList() {
     const fetchedProducts = res.data.map(p => ({ ...p, title: p.name }));
     setProducts(fetchedProducts);
   };
-
   useEffect(() => {
     fetchProducts();
   }, []);
