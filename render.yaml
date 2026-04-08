@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: myteastore-backend
+    runtime: node
+    rootDir: myteastore-backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
