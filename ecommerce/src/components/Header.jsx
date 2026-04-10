@@ -12,7 +12,7 @@ function Header() {
   return (
     <header className="header">
       <Link to="/" className="logo">
-        MyStore
+        TeaStore
       </Link>
 
       <nav className={`nav ${menuOpen ? "active" : ""}`}>
