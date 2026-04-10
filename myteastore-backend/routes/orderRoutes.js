@@ -18,6 +18,28 @@ router.get("/", async (req, res) => {
   }
 });
 
+// PATCH /api/orders/:id/status  — update order status
+router.patch("/:id/status", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  const VALID = ["paid", "received", "packed", "dispatched", "delivered"];
+  if (!status || !VALID.includes(status)) {
+    return res.status(400).json({ message: `Invalid status. Valid: ${VALID.join(", ")}` });
+  }
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("orders")
+      .update({ status })
+      .eq("id", id)
+      .select()
+      .single();
+    if (error) return res.status(500).json({ message: error.message });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // POST /api/orders/create  — create a Razorpay order
 router.post("/create", async (req, res) => {
   const { amount } = req.body;

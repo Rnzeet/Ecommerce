@@ -13,7 +13,7 @@ const app = express();
 
 app.use(cors({
   origin: (origin, callback) => callback(null, true),
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   credentials: true,
 }));
 app.use(express.json({ limit: "10mb" }));

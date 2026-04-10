@@ -69,6 +69,16 @@ function Admin() {
     }
   };
 
+  const updateOrderStatus = async (id, status) => {
+    try {
+      const res = await axios.patch(`${API}/api/orders/${id}/status`, { status });
+      setOrders(prev => prev.map(o => o.id === id ? { ...o, status: res.data.status } : o));
+      showToast(`Order marked as "${status}"`);
+    } catch (err) {
+      showToast(err.response?.data?.message || "Failed to update status", "error");
+    }
+  };
+
   const fetchBanners = async () => {
     try {
       const res = await axios.get(`${API}/api/banners`);
@@ -415,26 +425,57 @@ function Admin() {
                       <th>Items</th>
                       <th>Amount</th>
                       <th>Status</th>
+                      <th>Update Status</th>
                       <th>Date</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {orders.map(o => (
-                      <tr key={o.id}>
-                        <td><code className="order-id-code">{(o.razorpay_order_id || "").slice(-10)}</code></td>
-                        <td><span className="product-name">{o.customer_name || "—"}</span><p className="product-desc">{o.customer_email}</p></td>
-                        <td className="order-date">{o.customer_phone || "—"}</td>
-                        <td><p className="product-desc" style={{ maxWidth: 180 }}>{o.delivery_address || "—"}</p></td>
-                        <td>
-                          {(o.items || []).map((item, i) => (
-                            <div key={i} className="order-item-chip">{item.name} × {item.quantity}</div>
-                          ))}
-                        </td>
-                        <td className="price-cell">₹{parseFloat(o.total_amount || 0).toLocaleString("en-IN")}</td>
-                        <td><span className={`order-status-badge order-status-${o.status}`}>{o.status}</span></td>
-                        <td className="order-date">{o.created_at ? new Date(o.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"}</td>
-                      </tr>
-                    ))}
+                    {orders.map(o => {
+                      const STATUS_FLOW = ["received", "packed", "dispatched", "delivered"];
+                      const currentIdx = STATUS_FLOW.indexOf(o.status);
+                      const nextStatus = STATUS_FLOW[currentIdx + 1] || null;
+                      const prevStatus = currentIdx > 0 ? STATUS_FLOW[currentIdx - 1] : (o.status === "received" ? "paid" : null);
+                      const canAdvance = o.status !== "delivered";
+                      const isNew = o.status === "paid";
+                      return (
+                        <tr key={o.id}>
+                          <td><code className="order-id-code">{(o.razorpay_order_id || "").slice(-10)}</code></td>
+                          <td><span className="product-name">{o.customer_name || "—"}</span><p className="product-desc">{o.customer_email}</p></td>
+                          <td className="order-date">{o.customer_phone || "—"}</td>
+                          <td><p className="product-desc" style={{ maxWidth: 180 }}>{o.delivery_address || "—"}</p></td>
+                          <td>
+                            {(o.items || []).map((item, i) => (
+                              <div key={i} className="order-item-chip">{item.name} × {item.quantity}</div>
+                            ))}
+                          </td>
+                          <td className="price-cell">₹{parseFloat(o.total_amount || 0).toLocaleString("en-IN")}</td>
+                          <td><span className={`order-status-badge order-status-${o.status}`}>{o.status}</span></td>
+                          <td>
+                            <div className="order-action-btns">
+                              {isNew && (
+                                <button className="btn btn-sm order-btn-received" onClick={() => updateOrderStatus(o.id, "received")}>
+                                  ✅ Received
+                                </button>
+                              )}
+                              {!isNew && canAdvance && nextStatus && (
+                                <button className="btn btn-sm order-btn-advance" onClick={() => updateOrderStatus(o.id, nextStatus)}>
+                                  ▶ {nextStatus.charAt(0).toUpperCase() + nextStatus.slice(1)}
+                                </button>
+                              )}
+                              {!isNew && prevStatus && o.status !== "delivered" && (
+                                <button className="btn btn-sm order-btn-back" onClick={() => updateOrderStatus(o.id, prevStatus)}>
+                                  ◀ Undo
+                                </button>
+                              )}
+                              {o.status === "delivered" && (
+                                <span className="order-delivered-tag">✅ Delivered</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="order-date">{o.created_at ? new Date(o.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

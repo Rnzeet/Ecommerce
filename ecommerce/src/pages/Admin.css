@@ -469,6 +469,10 @@
 .order-status-paid { background: #f0fdf4; color: #16a34a; }
 .order-status-pending { background: #fff7ed; color: #ea580c; }
 .order-status-failed { background: #fef2f2; color: #dc2626; }
+.order-status-received { background: #eff6ff; color: #2563eb; }
+.order-status-packed { background: #fdf4ff; color: #9333ea; }
+.order-status-dispatched { background: #fff7ed; color: #ea580c; }
+.order-status-delivered { background: #f0fdf4; color: #15803d; }
 
 /* ── Order Detail Cells ── */
 .order-id-code {
@@ -491,15 +495,40 @@
   color: #475569;
 }
 
+/* ── Order Action Buttons ── */
+.order-action-btns { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; }
 
-.sidebar h2{
-  margin-bottom:30px;
+.order-btn-received {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+.order-btn-received:hover { background: #2563eb; color: white; }
+
+.order-btn-advance {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+.order-btn-advance:hover { background: #15803d; color: white; }
+
+.order-btn-back {
+  background: #fafafa;
+  color: #94a3b8;
+  border: 1px solid #e2e8f0;
+}
+.order-btn-back:hover { background: #f1f5f9; color: #475569; }
+
+.order-delivered-tag {
+  font-size: 12px;
+  font-weight: 700;
+  color: #15803d;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 4px 10px;
+  border-radius: 20px;
 }
 
-.sidebar ul{
-  list-style:none;
-  padding:0;
-}
 
 .sidebar li{
   padding:12px 0;
