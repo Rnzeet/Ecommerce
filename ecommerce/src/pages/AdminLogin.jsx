@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./AdminLogin.css";
 
-const API = import.meta.env.VITE_API_URL || "https://ecommerce-19y4.onrender.com";
+const API = import.meta.env.VITE_API_URL;
 
 function AdminLogin() {
   const navigate = useNavigate();

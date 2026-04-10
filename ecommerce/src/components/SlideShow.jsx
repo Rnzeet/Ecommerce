@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import "./SlideShow.css";
 
-const API = import.meta.env.VITE_API_URL || "https://ecommerce-19y4.onrender.com";
+const API = import.meta.env.VITE_API_URL;
 
 function Slideshow() {
   const [images, setImages] = useState([]);

@@ -11,7 +11,7 @@ function ProductList() {
     () => searchParams.get("category") || "All"
   );
 
-  const API = import.meta.env.VITE_API_URL || "https://ecommerce-19y4.onrender.com";
+  const API = import.meta.env.VITE_API_URL 
 
   const fetchProducts = async () => {
     const res = await axios.get(`${API}/api/products`);
