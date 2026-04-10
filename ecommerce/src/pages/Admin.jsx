@@ -19,6 +19,10 @@ function Admin() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [activeTab, setActiveTab] = useState("products");
   const [newCategory, setNewCategory] = useState("");
+  const [banners, setBanners] = useState([]);
+  const [bannerFile, setBannerFile] = useState(null);
+  const [bannerPreview, setBannerPreview] = useState(null);
+  const [bannerUploading, setBannerUploading] = useState(false);
   const [categories, setCategories] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem(CATEGORIES_KEY)) || [];
@@ -49,7 +53,53 @@ function Admin() {
     }
   };
 
-  useEffect(() => { fetchProducts(); }, []);
+  useEffect(() => { fetchProducts(); fetchBanners(); }, []);
+
+  const fetchBanners = async () => {
+    try {
+      const res = await axios.get(`${API}/api/banners`);
+      setBanners(res.data);
+    } catch {
+      // silent — banners table may not exist yet
+    }
+  };
+
+  const handleBannerFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setBannerFile(file);
+    setBannerPreview(URL.createObjectURL(file));
+  };
+
+  const handleBannerUpload = async () => {
+    if (!bannerFile) { showToast("Please select an image", "error"); return; }
+    setBannerUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("banner", bannerFile);
+      await axios.post(`${API}/api/banners/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      showToast("Banner uploaded successfully");
+      setBannerFile(null);
+      setBannerPreview(null);
+      fetchBanners();
+    } catch (err) {
+      showToast("Upload failed: " + (err.response?.data?.message || err.message), "error");
+    } finally {
+      setBannerUploading(false);
+    }
+  };
+
+  const handleBannerDelete = async (id) => {
+    try {
+      await axios.delete(`${API}/api/banners/${encodeURIComponent(id)}`);
+      showToast("Banner removed");
+      fetchBanners();
+    } catch (err) {
+      showToast("Delete failed: " + (err.response?.data?.message || err.message), "error");
+    }
+  };
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -176,6 +226,9 @@ function Admin() {
           <div className={`nav-item ${activeTab === "categories" ? "active" : ""}`} onClick={() => setActiveTab("categories")}>
             <span className="nav-icon">🏷️</span> Categories
           </div>
+          <div className={`nav-item ${activeTab === "banners" ? "active" : ""}`} onClick={() => setActiveTab("banners")}>
+            <span className="nav-icon">🖼️</span> Banners
+          </div>
         </nav>
         <button className="sidebar-logout" onClick={handleLogout}>
           <span>⏻</span> Logout
@@ -188,8 +241,8 @@ function Admin() {
         {/* Topbar */}
         <header className="admin-topbar">
           <div>
-            <h1 className="topbar-title">{activeTab === "categories" ? "Category Management" : "Product Management"}</h1>
-            <p className="topbar-sub">{activeTab === "categories" ? "Manage store categories" : "Manage your store inventory"}</p>
+            <h1 className="topbar-title">{activeTab === "categories" ? "Category Management" : activeTab === "banners" ? "Banner Management" : "Product Management"}</h1>
+            <p className="topbar-sub">{activeTab === "categories" ? "Manage store categories" : activeTab === "banners" ? "Upload and manage homepage banners" : "Manage your store inventory"}</p>
           </div>
           <div className="topbar-stats">
             <div className="stat-chip">
@@ -372,6 +425,69 @@ function Admin() {
                   </tbody>
                 </table>
               </div>
+            </section>
+          </>
+        )}
+
+        {/* ── BANNERS TAB ── */}
+        {activeTab === "banners" && (
+          <>
+            <section className="admin-card">
+              <div className="card-header">
+                <h2 className="card-title">🖼️ Upload New Banner</h2>
+                <span className="cat-count-badge">{banners.length} banner{banners.length !== 1 ? "s" : ""}</span>
+              </div>
+              <p className="form-hint" style={{ marginBottom: 16 }}>
+                Recommended size: <strong>1400 × 500px</strong> (wide landscape). Banners appear in the homepage slideshow.
+              </p>
+
+              <div className="banner-upload-zone">
+                <label className="banner-drop-label">
+                  <input type="file" accept="image/*" className="file-input-hidden" onChange={handleBannerFileChange} />
+                  {bannerPreview ? (
+                    <img src={bannerPreview} alt="Preview" className="banner-preview-img" />
+                  ) : (
+                    <div className="banner-drop-placeholder">
+                      <span className="banner-drop-icon">🖼️</span>
+                      <span className="banner-drop-text">Click to select a banner image</span>
+                      <span className="banner-drop-sub">PNG, JPG, WEBP up to 10MB</span>
+                    </div>
+                  )}
+                </label>
+              </div>
+
+              <div className="form-actions" style={{ marginTop: 16 }}>
+                <button className="btn btn-primary" onClick={handleBannerUpload} disabled={bannerUploading || !bannerFile}>
+                  {bannerUploading ? "⏳ Uploading..." : "Upload Banner"}
+                </button>
+                {bannerPreview && (
+                  <button className="btn btn-ghost" onClick={() => { setBannerFile(null); setBannerPreview(null); }}>
+                    Clear
+                  </button>
+                )}
+              </div>
+            </section>
+
+            <section className="admin-card">
+              <div className="card-header">
+                <h2 className="card-title">Active Banners</h2>
+              </div>
+              {banners.length === 0 ? (
+                <p className="empty-row">No banners uploaded yet. Upload one above to show it in the homepage slideshow.</p>
+              ) : (
+                <div className="banner-grid">
+                  {banners.map((b, i) => (
+                    <div key={b.id} className="banner-item">
+                      <div className="banner-item-num">#{i + 1}</div>
+                      <img src={b.url} alt={`Banner ${i + 1}`} className="banner-thumb" />
+                      <div className="banner-item-actions">
+                        <a href={b.url} target="_blank" rel="noreferrer" className="btn btn-sm btn-edit">View</a>
+                        <button className="btn btn-sm btn-danger" onClick={() => handleBannerDelete(b.id)}>Remove</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </section>
           </>
         )}

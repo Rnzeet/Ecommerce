@@ -1,34 +1,54 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./SlideShow.css";
 
 import banner1 from "../assets/image3.jpg";
 import banner2 from "../assets/image2.jpg";
 import banner3 from "../assets/download.jpg";
-import banner4 from "../assets/image4.jpg";
+
+const STATIC_BANNERS = [banner1, banner2, banner3];
+const API = import.meta.env.VITE_API_URL || "https://ecommerce-19y4.onrender.com";
 
 function Slideshow() {
-  const images = [banner1, banner2, banner3];
-
+  const [images, setImages] = useState(STATIC_BANNERS);
   const [current, setCurrent] = useState(0);
+  const intervalRef = useRef(null);
 
-  // Auto slide
   useEffect(() => {
-    const interval = setInterval(() => {
-      nextSlide();
+    axios_fetch();
+  }, []);
+
+  const axios_fetch = async () => {
+    try {
+      const res = await fetch(`${API}/api/banners`);
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        setImages(data.map(b => b.url));
+        setCurrent(0);
+      }
+    } catch {
+      // keep static fallback
+    }
+  };
+
+  const startInterval = () => {
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      setCurrent(prev => (prev + 1) % images.length);
     }, 4000);
-
-    return () => clearInterval(interval);
-  }, [current]);
-
-  const nextSlide = () => {
-    setCurrent((prev) => (prev + 1) % images.length);
   };
 
-  const prevSlide = () => {
-    setCurrent((prev) =>
-      prev === 0 ? images.length - 1 : prev - 1
-    );
+  useEffect(() => {
+    startInterval();
+    return () => clearInterval(intervalRef.current);
+  }, [images]);
+
+  const goTo = (index) => {
+    setCurrent(index);
+    startInterval();
   };
+
+  const prevSlide = () => goTo(current === 0 ? images.length - 1 : current - 1);
+  const nextSlide = () => goTo((current + 1) % images.length);
 
   return (
     <div className="slideshow">
@@ -36,12 +56,8 @@ function Slideshow() {
       <img src={images[current]} alt="banner" />
 
       {/* Arrows */}
-      <button className="arrow left" onClick={prevSlide}>
-        ❮
-      </button>
-      <button className="arrow right" onClick={nextSlide}>
-        ❯
-      </button>
+      <button className="arrow left" onClick={prevSlide}>❮</button>
+      <button className="arrow right" onClick={nextSlide}>❯</button>
 
       {/* Dots */}
       <div className="dots">
@@ -49,8 +65,8 @@ function Slideshow() {
           <span
             key={index}
             className={index === current ? "dot active" : "dot"}
-            onClick={() => setCurrent(index)}
-          ></span>
+            onClick={() => goTo(index)}
+          />
         ))}
       </div>
     </div>
