@@ -2,270 +2,292 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import "./Admin.css";
+
 const API = import.meta.env.VITE_API_URL || "https://ecommerce-19y4.onrender.com";
 
 function Admin() {
   const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
+  const [editId, setEditId] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [search, setSearch] = useState("");
+  const [toast, setToast] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [form, setForm] = useState({
+    name: "", price: "", image: "", category: "", description: "", imageName: "",
+  });
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3500);
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get(`${API}/api/products`);
+      setProducts(res.data);
+    } catch {
+      showToast("Failed to fetch products", "error");
+    }
+  };
+
+  useEffect(() => { fetchProducts(); }, []);
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+    setForm((prev) => ({ ...prev, imageName: file.name }));
+  };
+
+  const resetForm = () => {
+    setForm({ name: "", price: "", image: "", category: "", description: "", imageName: "" });
+    setImageFile(null);
+    setImagePreview(null);
+    setEditId(null);
+  };
+
+  const handleAdd = async () => {
+    if (!form.name || !form.price) {
+      showToast("Name and price are required", "error");
+      return;
+    }
+    setUploading(true);
+    try {
+      let imageUrl = form.image;
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append("image", imageFile);
+        const uploadRes = await axios.post(`${API}/api/products/upload-image`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        imageUrl = uploadRes.data.url;
+      }
+      const payload = {
+        name: form.name, price: form.price, image: imageUrl,
+        category: form.category, description: form.description,
+      };
+      if (editId) {
+        await axios.put(`${API}/api/products/update-product/${editId}`, payload);
+        showToast("Product updated successfully");
+      } else {
+        await axios.post(`${API}/api/products/add-product`, payload);
+        showToast("Product added successfully");
+      }
+      resetForm();
+      fetchProducts();
+    } catch (err) {
+      showToast("Failed to save product. " + (err.response?.data?.message || err.message), "error");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleEdit = (p) => {
+    setForm({ name: p.name, price: p.price, image: p.image, category: p.category, description: p.description || "", imageName: "" });
+    setImagePreview(p.image || null);
+    setEditId(p.id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${API}/api/products/delete-product/${id}`);
+      showToast("Product deleted");
+      setDeleteConfirm(null);
+      fetchProducts();
+    } catch {
+      showToast("Failed to delete product", "error");
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("isAdminLoggedIn");
     navigate("/admin-login");
   };
-const [editId, setEditId] = useState(null);
 
-  const [products, setProducts] = useState([]);
-  const [form, setForm] = useState({
-    name: "",
-    price: "",
-    image: "",
-     category: "",
-     description: "",
-    imageName: "",
-  });
+  const filtered = products.filter(p =>
+    p.name?.toLowerCase().includes(search.toLowerCase()) ||
+    p.category?.toLowerCase().includes(search.toLowerCase())
+  );
 
-  const fetchProducts = async () => {
-    const res = await axios.get(`${API}/api/products`);
-    setProducts(res.data);
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const [uploading, setUploading] = useState(false);
-  const [imageFile, setImageFile] = useState(null);
-
-  const handleFileChange = (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-    setImageFile(file);
-    setForm((prev) => ({ ...prev, imageName: file.name }));
-  };
-
-const handleAdd = async () => {
-  setUploading(true);
-  try {
-    let imageUrl = form.image;
-
-    // Upload new file if one was selected
-    if (imageFile) {
-      const formData = new FormData();
-      formData.append("image", imageFile);
-      const uploadRes = await axios.post(
-        `${API}/api/products/upload-image`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-      imageUrl = uploadRes.data.url;
-    }
-
-    const payload = {
-      name: form.name,
-      price: form.price,
-      image: imageUrl,
-      category: form.category,
-      description: form.description,
-    };
-
-    if (editId) {
-      await axios.put(`${API}/api/products/update-product/${editId}`, payload);
-      setEditId(null);
-    } else {
-      await axios.post(`${API}/api/products/add-product`, payload);
-    }
-
-    setForm({ name: "", price: "", image: "", category: "", description: "", imageName: "" });
-    setImageFile(null);
-    fetchProducts();
-  } catch (err) {
-    alert("Failed to save product. " + (err.response?.data?.message || err.message));
-  } finally {
-    setUploading(false);
-  }
-};
-
-
-  const handleDelete = async (id) => {
-    await axios.delete(`${API}/api/products/delete-product/${id}`);
-    fetchProducts();
-  };
+  const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
 
   return (
-    <div style={{ padding: "30px", fontFamily: "Arial" }}>
-      
-      {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "30px",
-        }}
-      >
-        <h2>Admin Dashboard</h2>
+    <div className="admin-wrapper">
 
-        <button
-          onClick={handleLogout}
-          style={{
-            background: "#e74c3c",
-            color: "white",
-            border: "none",
-            padding: "8px 18px",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: "600",
-          }}
-        >
-          Logout
+      {/* Sidebar */}
+      <aside className="admin-sidebar">
+        <div className="sidebar-logo">
+          <span className="logo-icon">🍵</span>
+          <span className="logo-text">MyTeaStore</span>
+        </div>
+        <nav className="sidebar-nav">
+          <div className="nav-label">MANAGEMENT</div>
+          <div className="nav-item active">
+            <span className="nav-icon">📦</span> Products
+          </div>
+        </nav>
+        <button className="sidebar-logout" onClick={handleLogout}>
+          <span>⏻</span> Logout
         </button>
-      </div>
+      </aside>
 
-      {/* Add Product */}
-      <div
-        style={{
-          background: "#f8f9fa",
-          padding: "20px",
-          borderRadius: "10px",
-          marginBottom: "30px",
-        }}
-      >
-        <h3>Add Product</h3>
+      {/* Main content */}
+      <main className="admin-main">
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-          <input
-            name="name"
-            placeholder="Product Name"
-            value={form.name}
-            onChange={handleChange}
-          />
-
-          <input
-            name="price"
-            placeholder="Price"
-            value={form.price}
-            onChange={handleChange}
-          />
-
+        {/* Topbar */}
+        <header className="admin-topbar">
           <div>
-            <input type="file" accept="image/*" onChange={handleFileChange} />
-            {form.imageName && (
-              <div style={{ marginTop: 8, color: '#2c7be5' }} className="file-name">📎 {form.imageName}</div>
-            )}
+            <h1 className="topbar-title">Product Management</h1>
+            <p className="topbar-sub">Manage your store inventory</p>
+          </div>
+          <div className="topbar-stats">
+            <div className="stat-chip">
+              <span className="stat-num">{products.length}</span>
+              <span className="stat-lbl">Products</span>
+            </div>
+            <div className="stat-chip">
+              <span className="stat-num">{categories.length}</span>
+              <span className="stat-lbl">Categories</span>
+            </div>
+          </div>
+        </header>
+
+        {/* Form Card */}
+        <section className="admin-card">
+          <div className="card-header">
+            <h2 className="card-title">{editId ? "✏️ Edit Product" : "➕ Add New Product"}</h2>
+            {editId && <button className="btn btn-ghost" onClick={resetForm}>Cancel Edit</button>}
           </div>
 
-          <input
-            name="category"
-            placeholder="Category"
-            value={form.category}
-            onChange={handleChange}
-          />
+          <div className="form-grid">
+            <div className="form-group">
+              <label className="form-label">Product Name *</label>
+              <input className="form-input" name="name" placeholder="e.g. Chamomile Tea" value={form.name} onChange={handleChange} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Price (₹) *</label>
+              <input className="form-input" name="price" type="number" placeholder="e.g. 299" value={form.price} onChange={handleChange} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Category</label>
+              <input className="form-input" name="category" placeholder="e.g. Herbal" value={form.category} onChange={handleChange} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Product Image</label>
+              <label className="file-upload-label">
+                <input type="file" accept="image/*" onChange={handleFileChange} className="file-input-hidden" />
+                <span className="file-upload-btn">📁 Choose Image</span>
+                {form.imageName && <span className="file-name-tag">{form.imageName}</span>}
+              </label>
+            </div>
+          </div>
+
+          <div className="form-group" style={{ marginTop: "16px" }}>
+            <label className="form-label">Description</label>
+            <textarea className="form-input form-textarea" name="description" placeholder="Brief product description..." value={form.description} onChange={handleChange} />
+          </div>
+
+          {imagePreview && (
+            <div className="image-preview-wrap">
+              <img src={imagePreview} alt="Preview" className="image-preview" />
+              <span className="preview-label">Image Preview</span>
+            </div>
+          )}
+
+          <div className="form-actions">
+            <button className={`btn ${editId ? "btn-warning" : "btn-primary"}`} onClick={handleAdd} disabled={uploading}>
+              {uploading ? "⏳ Saving..." : editId ? "Update Product" : "Add Product"}
+            </button>
+            {editId && <button className="btn btn-ghost" onClick={resetForm}>Cancel</button>}
+          </div>
+        </section>
+
+        {/* Products Table */}
+        <section className="admin-card">
+          <div className="card-header">
+            <h2 className="card-title">All Products</h2>
+            <input
+              className="search-input"
+              placeholder="🔍 Search by name or category..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+
+          <div className="table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr><td colSpan="5" className="empty-row">No products found</td></tr>
+                ) : filtered.map((p) => (
+                  <tr key={p.id}>
+                    <td>
+                      {p.image
+                        ? <img src={p.image} alt={p.name} className="table-img" />
+                        : <div className="table-img-placeholder">🍵</div>}
+                    </td>
+                    <td>
+                      <span className="product-name">{p.name}</span>
+                      {p.description && <p className="product-desc">{p.description}</p>}
+                    </td>
+                    <td><span className="category-badge">{p.category || "—"}</span></td>
+                    <td className="price-cell">₹{p.price}</td>
+                    <td>
+                      <div className="action-btns">
+                        <button className="btn btn-sm btn-edit" onClick={() => handleEdit(p)}>Edit</button>
+                        <button className="btn btn-sm btn-danger" onClick={() => setDeleteConfirm(p.id)}>Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
+
+      {/* Toast notification */}
+      {toast && (
+        <div className={`toast toast-${toast.type}`}>
+          {toast.type === "success" ? "✅" : "❌"} {toast.message}
         </div>
+      )}
 
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={form.description}
-          onChange={handleChange}
-          style={{ width: "100%", marginTop: "10px" }}
-        />
-
-       <button
-  onClick={handleAdd}
-  disabled={uploading}
-  style={{
-    marginTop: "10px",
-    background: uploading ? "#aaa" : "#2ecc71",
-    border: "none",
-    padding: "10px 18px",
-    color: "white",
-    borderRadius: "6px",
-    cursor: uploading ? "not-allowed" : "pointer",
-  }}
->
-  {uploading ? "⏳ Saving..." : editId ? "Update Product" : "Add Product"}
-</button>
-
-      </div>
-
-      {/* Product Table */}
-
-      <h3>Products List</h3>
-
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-        }}
-      >
-        <thead>
-          <tr style={{ background: "#f1f1f1" }}>
-            <th style={{ padding: "10px",color: "black" }}>Image</th>
-            <th style={{ padding: "10px",color: "black" }}>Name</th>
-            <th style={{ padding: "10px",color: "black" }}>Price</th>
-            <th style={{ padding: "10px",color: "black" }}>Category</th>
-            <th style={{ padding: "10px",color: "black" }}>Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {products.map((p) => (
-            <tr key={p.id} style={{ borderBottom: "1px solid #ddd" }}>
-              
-              <td style={{ padding: "10px" }}>
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  style={{ width: "50px", borderRadius: "6px" }}
-                />
-              </td>
-
-              <td>{p.name}</td>
-
-              <td>₹{p.price}</td>
-
-              <td>{p.category}</td>
-<button
-  onClick={() => {
-    setForm({
-      name: p.name,
-      price: p.price,
-      image: p.image,
-      category: p.category,
-      description: p.description
-    });
-    setEditId(p.id);
-  }}
->
-Edit
-</button>
-
-              <td>
-                <button
-                  onClick={() => handleDelete(p.id)}
-                  style={{
-                    background: "#e74c3c",
-                    border: "none",
-                    padding: "6px 12px",
-                    color: "white",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Delete
-                </button>
-              </td>
-
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* Delete confirmation modal */}
+      {deleteConfirm && (
+        <div className="modal-overlay" onClick={() => setDeleteConfirm(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3 className="modal-title">Delete Product?</h3>
+            <p className="modal-text">This action cannot be undone.</p>
+            <div className="modal-actions">
+              <button className="btn btn-danger" onClick={() => handleDelete(deleteConfirm)}>Yes, Delete</button>
+              <button className="btn btn-ghost" onClick={() => setDeleteConfirm(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
 }
 
 export default Admin;
+
