@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Checkout.css";
 
-const API = import.meta.env.VITE_API_URL;
+const API = import.meta.env.VITE_API_URL || "https://ecommerce-19y4.onrender.com";
 const RZP_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
 function loadRazorpayScript() {

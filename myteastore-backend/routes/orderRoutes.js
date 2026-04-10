@@ -3,17 +3,19 @@ const router = express.Router();
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
-
 // POST /api/orders/create  — create a Razorpay order
 router.post("/create", async (req, res) => {
   const { amount } = req.body;
   if (!amount || isNaN(amount)) {
     return res.status(400).json({ message: "Invalid amount" });
   }
+  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+    return res.status(500).json({ message: "Razorpay keys not configured on server" });
+  }
+  const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+  });
   try {
     const order = await razorpay.orders.create({
       amount: Math.round(parseFloat(amount) * 100), // paise
