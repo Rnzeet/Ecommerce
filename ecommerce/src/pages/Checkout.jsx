@@ -1,5 +1,6 @@
 import { useCart } from "../context/CartContext";
-import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Checkout.css";
@@ -22,7 +23,15 @@ const STEPS = ["Delivery", "Payment"];
 
 function Checkout() {
   const { cart, totalPrice, clearCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (user === null) {
+      navigate("/login?next=/checkout", { replace: true });
+    }
+  }, [user, navigate]);
 
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);

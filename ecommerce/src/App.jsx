@@ -9,6 +9,7 @@ import Checkout from "./pages/Checkout";
 import Products from "./pages/Products";
 import Admin from "./pages/Admin";
 import AdminLogin from "./pages/AdminLogin";
+import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Hide header on admin pages
@@ -27,6 +28,7 @@ function AppContent() {
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route

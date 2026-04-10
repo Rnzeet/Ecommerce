@@ -1,13 +1,21 @@
 import { useState } from "react";
 import { FaShoppingCart, FaBars, FaTimes } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import "./Header.css";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { cart } = useCart();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <header className="header">
@@ -29,7 +37,23 @@ function Header() {
           <span className="cart-count">{cartCount}</span>
         </Link>
 
-        <button className="login-btn">Login</button>
+        {user ? (
+          <div className="header-user">
+            {user.user_metadata?.avatar_url && (
+              <img
+                src={user.user_metadata.avatar_url}
+                alt="avatar"
+                className="header-avatar"
+              />
+            )}
+            <span className="header-username">
+              {user.user_metadata?.full_name?.split(" ")[0] || "User"}
+            </span>
+            <button className="signout-btn" onClick={handleSignOut}>Sign out</button>
+          </div>
+        ) : (
+          <Link to="/login" className="login-btn">Login</Link>
+        )}
 
         <div className="menu-icon" onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? <FaTimes /> : <FaBars />}

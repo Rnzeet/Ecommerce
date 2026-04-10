@@ -73,12 +73,56 @@
 }
 
 .login-btn {
-  padding: 6px 12px;
+  padding: 6px 14px;
   background-color: #facc15;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
+  color: #1a1a1a;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #facc15;
+}
+
+.header-username {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #f9fafb;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.signout-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid #6b7280;
+  border-radius: 4px;
+  color: #d1d5db;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.signout-btn:hover {
+  background: #374151;
+  border-color: #9ca3af;
+  color: #fff;
 }
 .menu-icon {
   display: none;
