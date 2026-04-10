@@ -5,6 +5,7 @@ import axios from "axios";
 import "./Admin.css";
 
 const API = import.meta.env.VITE_API_URL || "https://ecommerce-19y4.onrender.com";
+const CATEGORIES_KEY = "myteastore_categories";
 
 function Admin() {
   const navigate = useNavigate();
@@ -16,6 +17,13 @@ function Admin() {
   const [search, setSearch] = useState("");
   const [toast, setToast] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [activeTab, setActiveTab] = useState("products");
+  const [newCategory, setNewCategory] = useState("");
+  const [categories, setCategories] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(CATEGORIES_KEY)) || [];
+    } catch { return []; }
+  });
   const [form, setForm] = useState({
     name: "", price: "", image: "", category: "", description: "", imageName: "",
   });
@@ -29,6 +37,13 @@ function Admin() {
     try {
       const res = await axios.get(`${API}/api/products`);
       setProducts(res.data);
+      // Auto-sync categories from existing products
+      setCategories(prev => {
+        const fromProducts = res.data.map(p => p.category).filter(Boolean);
+        const merged = [...new Set([...prev, ...fromProducts])];
+        localStorage.setItem(CATEGORIES_KEY, JSON.stringify(merged));
+        return merged;
+      });
     } catch {
       showToast("Failed to fetch products", "error");
     }
@@ -93,6 +108,7 @@ function Admin() {
     setForm({ name: p.name, price: p.price, image: p.image, category: p.category, description: p.description || "", imageName: "" });
     setImagePreview(p.image || null);
     setEditId(p.id);
+    setActiveTab("products");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -107,6 +123,32 @@ function Admin() {
     }
   };
 
+  const handleAddCategory = () => {
+    const trimmed = newCategory.trim();
+    if (!trimmed) return;
+    if (categories.map(c => c.toLowerCase()).includes(trimmed.toLowerCase())) {
+      showToast("Category already exists", "error");
+      return;
+    }
+    const updated = [...categories, trimmed];
+    setCategories(updated);
+    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(updated));
+    setNewCategory("");
+    showToast(`Category "${trimmed}" added`);
+  };
+
+  const handleDeleteCategory = (cat) => {
+    const usedBy = products.filter(p => p.category === cat).length;
+    if (usedBy > 0) {
+      showToast(`Cannot delete — ${usedBy} product(s) use this category`, "error");
+      return;
+    }
+    const updated = categories.filter(c => c !== cat);
+    setCategories(updated);
+    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(updated));
+    showToast(`Category "${cat}" removed`);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("isAdminLoggedIn");
     navigate("/admin-login");
@@ -116,8 +158,6 @@ function Admin() {
     p.name?.toLowerCase().includes(search.toLowerCase()) ||
     p.category?.toLowerCase().includes(search.toLowerCase())
   );
-
-  const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
 
   return (
     <div className="admin-wrapper">
@@ -130,8 +170,11 @@ function Admin() {
         </div>
         <nav className="sidebar-nav">
           <div className="nav-label">MANAGEMENT</div>
-          <div className="nav-item active">
+          <div className={`nav-item ${activeTab === "products" ? "active" : ""}`} onClick={() => setActiveTab("products")}>
             <span className="nav-icon">📦</span> Products
+          </div>
+          <div className={`nav-item ${activeTab === "categories" ? "active" : ""}`} onClick={() => setActiveTab("categories")}>
+            <span className="nav-icon">🏷️</span> Categories
           </div>
         </nav>
         <button className="sidebar-logout" onClick={handleLogout}>
@@ -145,8 +188,8 @@ function Admin() {
         {/* Topbar */}
         <header className="admin-topbar">
           <div>
-            <h1 className="topbar-title">Product Management</h1>
-            <p className="topbar-sub">Manage your store inventory</p>
+            <h1 className="topbar-title">{activeTab === "categories" ? "Category Management" : "Product Management"}</h1>
+            <p className="topbar-sub">{activeTab === "categories" ? "Manage store categories" : "Manage your store inventory"}</p>
           </div>
           <div className="topbar-stats">
             <div className="stat-chip">
@@ -160,107 +203,178 @@ function Admin() {
           </div>
         </header>
 
-        {/* Form Card */}
-        <section className="admin-card">
-          <div className="card-header">
-            <h2 className="card-title">{editId ? "✏️ Edit Product" : "➕ Add New Product"}</h2>
-            {editId && <button className="btn btn-ghost" onClick={resetForm}>Cancel Edit</button>}
-          </div>
+        {/* ── CATEGORIES TAB ── */}
+        {activeTab === "categories" && (
+          <>
+            <section className="admin-card">
+              <div className="card-header">
+                <h2 className="card-title">➕ Add New Category</h2>
+              </div>
+              <div className="cat-add-row">
+                <input
+                  className="form-input"
+                  placeholder="e.g. Green Tea, Herbal, Accessories..."
+                  value={newCategory}
+                  onChange={e => setNewCategory(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && handleAddCategory()}
+                />
+                <button className="btn btn-primary" onClick={handleAddCategory}>Add Category</button>
+              </div>
+            </section>
 
-          <div className="form-grid">
-            <div className="form-group">
-              <label className="form-label">Product Name *</label>
-              <input className="form-input" name="name" placeholder="e.g. Chamomile Tea" value={form.name} onChange={handleChange} />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Price (₹) *</label>
-              <input className="form-input" name="price" type="number" placeholder="e.g. 299" value={form.price} onChange={handleChange} />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Category</label>
-              <input className="form-input" name="category" placeholder="e.g. Herbal" value={form.category} onChange={handleChange} />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Product Image</label>
-              <label className="file-upload-label">
-                <input type="file" accept="image/*" onChange={handleFileChange} className="file-input-hidden" />
-                <span className="file-upload-btn">📁 Choose Image</span>
-                {form.imageName && <span className="file-name-tag">{form.imageName}</span>}
-              </label>
-            </div>
-          </div>
-
-          <div className="form-group" style={{ marginTop: "16px" }}>
-            <label className="form-label">Description</label>
-            <textarea className="form-input form-textarea" name="description" placeholder="Brief product description..." value={form.description} onChange={handleChange} />
-          </div>
-
-          {imagePreview && (
-            <div className="image-preview-wrap">
-              <img src={imagePreview} alt="Preview" className="image-preview" />
-              <span className="preview-label">Image Preview</span>
-            </div>
-          )}
-
-          <div className="form-actions">
-            <button className={`btn ${editId ? "btn-warning" : "btn-primary"}`} onClick={handleAdd} disabled={uploading}>
-              {uploading ? "⏳ Saving..." : editId ? "Update Product" : "Add Product"}
-            </button>
-            {editId && <button className="btn btn-ghost" onClick={resetForm}>Cancel</button>}
-          </div>
-        </section>
-
-        {/* Products Table */}
-        <section className="admin-card">
-          <div className="card-header">
-            <h2 className="card-title">All Products</h2>
-            <input
-              className="search-input"
-              placeholder="🔍 Search by name or category..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-          </div>
-
-          <div className="table-wrap">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Image</th>
-                  <th>Name</th>
-                  <th>Category</th>
-                  <th>Price</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.length === 0 ? (
-                  <tr><td colSpan="5" className="empty-row">No products found</td></tr>
-                ) : filtered.map((p) => (
-                  <tr key={p.id}>
-                    <td>
-                      {p.image
-                        ? <img src={p.image} alt={p.name} className="table-img" />
-                        : <div className="table-img-placeholder">🍵</div>}
-                    </td>
-                    <td>
-                      <span className="product-name">{p.name}</span>
-                      {p.description && <p className="product-desc">{p.description}</p>}
-                    </td>
-                    <td><span className="category-badge">{p.category || "—"}</span></td>
-                    <td className="price-cell">₹{p.price}</td>
-                    <td>
-                      <div className="action-btns">
-                        <button className="btn btn-sm btn-edit" onClick={() => handleEdit(p)}>Edit</button>
-                        <button className="btn btn-sm btn-danger" onClick={() => setDeleteConfirm(p.id)}>Delete</button>
+            <section className="admin-card">
+              <div className="card-header">
+                <h2 className="card-title">All Categories</h2>
+                <span className="cat-count-badge">{categories.length} total</span>
+              </div>
+              {categories.length === 0 ? (
+                <p className="empty-row">No categories yet. Add one above.</p>
+              ) : (
+                <div className="cat-grid">
+                  {categories.map((cat) => {
+                    const count = products.filter(p => p.category === cat).length;
+                    return (
+                      <div key={cat} className="cat-card">
+                        <div className="cat-card-left">
+                          <span className="cat-icon">🏷️</span>
+                          <div>
+                            <span className="cat-name">{cat}</span>
+                            <span className="cat-product-count">{count} product{count !== 1 ? "s" : ""}</span>
+                          </div>
+                        </div>
+                        <button
+                          className="btn btn-sm btn-danger"
+                          onClick={() => handleDeleteCategory(cat)}
+                          title={count > 0 ? "Cannot delete — products assigned" : "Delete category"}
+                        >
+                          Remove
+                        </button>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+          </>
+        )}
+
+        {/* ── PRODUCTS TAB ── */}
+        {activeTab === "products" && (
+          <>
+            {/* Form Card */}
+            <section className="admin-card">
+              <div className="card-header">
+                <h2 className="card-title">{editId ? "✏️ Edit Product" : "➕ Add New Product"}</h2>
+                {editId && <button className="btn btn-ghost" onClick={resetForm}>Cancel Edit</button>}
+              </div>
+
+              <div className="form-grid">
+                <div className="form-group">
+                  <label className="form-label">Product Name *</label>
+                  <input className="form-input" name="name" placeholder="e.g. Chamomile Tea" value={form.name} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Price (₹) *</label>
+                  <input className="form-input" name="price" type="number" placeholder="e.g. 299" value={form.price} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Category</label>
+                  <select className="form-input form-select" name="category" value={form.category} onChange={handleChange}>
+                    <option value="">— Select a category —</option>
+                    {categories.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                  {categories.length === 0 && (
+                    <span className="form-hint">
+                      No categories yet —{" "}
+                      <button type="button" className="link-btn" onClick={() => setActiveTab("categories")}>create one first</button>
+                    </span>
+                  )}
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Product Image</label>
+                  <label className="file-upload-label">
+                    <input type="file" accept="image/*" onChange={handleFileChange} className="file-input-hidden" />
+                    <span className="file-upload-btn">📁 Choose Image</span>
+                    {form.imageName && <span className="file-name-tag">{form.imageName}</span>}
+                  </label>
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginTop: "16px" }}>
+                <label className="form-label">Description</label>
+                <textarea className="form-input form-textarea" name="description" placeholder="Brief product description..." value={form.description} onChange={handleChange} />
+              </div>
+
+              {imagePreview && (
+                <div className="image-preview-wrap">
+                  <img src={imagePreview} alt="Preview" className="image-preview" />
+                  <span className="preview-label">Image Preview</span>
+                </div>
+              )}
+
+              <div className="form-actions">
+                <button className={`btn ${editId ? "btn-warning" : "btn-primary"}`} onClick={handleAdd} disabled={uploading}>
+                  {uploading ? "⏳ Saving..." : editId ? "Update Product" : "Add Product"}
+                </button>
+                {editId && <button className="btn btn-ghost" onClick={resetForm}>Cancel</button>}
+              </div>
+            </section>
+
+            {/* Products Table */}
+            <section className="admin-card">
+              <div className="card-header">
+                <h2 className="card-title">All Products</h2>
+                <input
+                  className="search-input"
+                  placeholder="🔍 Search by name or category..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
+              </div>
+
+              <div className="table-wrap">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Image</th>
+                      <th>Name</th>
+                      <th>Category</th>
+                      <th>Price</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.length === 0 ? (
+                      <tr><td colSpan="5" className="empty-row">No products found</td></tr>
+                    ) : filtered.map((p) => (
+                      <tr key={p.id}>
+                        <td>
+                          {p.image
+                            ? <img src={p.image} alt={p.name} className="table-img" />
+                            : <div className="table-img-placeholder">🍵</div>}
+                        </td>
+                        <td>
+                          <span className="product-name">{p.name}</span>
+                          {p.description && <p className="product-desc">{p.description}</p>}
+                        </td>
+                        <td><span className="category-badge">{p.category || "—"}</span></td>
+                        <td className="price-cell">₹{p.price}</td>
+                        <td>
+                          <div className="action-btns">
+                            <button className="btn btn-sm btn-edit" onClick={() => handleEdit(p)}>Edit</button>
+                            <button className="btn btn-sm btn-danger" onClick={() => setDeleteConfirm(p.id)}>Delete</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </>
+        )}
 
       </main>
 

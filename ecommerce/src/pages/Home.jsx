@@ -1,15 +1,55 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import Slideshow from "../components/SlideShow";
 import ProductList from "../components/ProductList";
 import Footer from "../components/Footer";
-import "./Home.css"; // import new CSS
+import "./Home.css";
+
+const API = import.meta.env.VITE_API_URL || "https://ecommerce-19y4.onrender.com";
+
+const CATEGORY_ICONS = {
+  default: "🍵",
+  green: "🌿",
+  black: "🖤",
+  herbal: "🌸",
+  white: "🤍",
+  oolong: "🍃",
+  chai: "☕",
+  matcha: "🍵",
+  fruit: "🍓",
+  mint: "🌱",
+  accessori: "🫖",
+  gift: "🎁",
+  blend: "🧪",
+};
+
+function getCategoryIcon(name) {
+  const lower = name.toLowerCase();
+  for (const [key, icon] of Object.entries(CATEGORY_ICONS)) {
+    if (key !== "default" && lower.includes(key)) return icon;
+  }
+  return CATEGORY_ICONS.default;
+}
 
 function Home() {
-  const categories = [
-    { title: "Green Tea", img: "/assets/green-tea.jpg" },
-    { title: "Black Tea", img: "/assets/black-tea.jpg" },
-    { title: "Herbal Tea", img: "/assets/herbal-tea.jpg" },
-    { title: "Tea Accessories", img: "/assets/tea-accessories.jpg" }
-  ];
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    // Read from localStorage first (set by Admin), then sync from API
+    const stored = JSON.parse(localStorage.getItem("myteastore_categories") || "[]");
+    if (stored.length > 0) setCategories(stored);
+
+    axios.get(`${API}/api/products`).then(res => {
+      const fromProducts = [...new Set(res.data.map(p => p.category).filter(Boolean))];
+      if (fromProducts.length > 0) {
+        const merged = [...new Set([...stored, ...fromProducts])];
+        setCategories(merged);
+        localStorage.setItem("myteastore_categories", JSON.stringify(merged));
+      }
+    }).catch(() => {});
+  }, []);
 
   const testimonials = [
     { text: "Amazing tea and fast delivery!", name: "Priya" },
@@ -27,18 +67,26 @@ function Home() {
         <h2 style={{ color: "white" }}>Featured Products</h2>
         <ProductList />
       </section>
- 
 
-      <section className="categories">
+      <section className="categories-section">
         <h2 style={{ color: "white" }}>Shop by Category</h2>
-        <div className="categories">
-          {categories.map((cat, i) => (
-            <div key={i} className="category-card">
-              <img src={cat.img} alt={cat.title} />
-              <p>{cat.title}</p>
-            </div>
-          ))}
-        </div>
+        {categories.length === 0 ? (
+          <p style={{ textAlign: "center", color: "rgba(255,255,255,0.6)" }}>No categories available yet.</p>
+        ) : (
+          <div className="categories-grid">
+            {categories.map((cat, i) => (
+              <div
+                key={i}
+                className="category-card"
+                onClick={() => navigate(`/products?category=${encodeURIComponent(cat)}`)}
+              >
+                <div className="cat-emoji">{getCategoryIcon(cat)}</div>
+                <p className="cat-label">{cat}</p>
+                <span className="cat-arrow">→</span>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="about">

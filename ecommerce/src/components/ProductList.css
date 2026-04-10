@@ -1,4 +1,62 @@
 
+/* ── Category Filter Bar ── */
+.product-list-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.category-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  padding: 20px 20px 0;
+  margin-bottom: 8px;
+}
+
+.filter-tab {
+  padding: 9px 22px;
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.08);
+  color: #e2e8f0;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  backdrop-filter: blur(4px);
+  letter-spacing: 0.3px;
+}
+
+.filter-tab:hover {
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.5);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.filter-tab-active {
+  background: white;
+  color: #1e293b;
+  border-color: white;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+}
+
+.filter-tab-active:hover {
+  background: white;
+  color: #1e293b;
+}
+
+.no-products {
+  text-align: center;
+  color: rgba(255,255,255,0.6);
+  font-size: 16px;
+  padding: 60px 20px;
+  grid-column: 1 / -1;
+}
+
 .products-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

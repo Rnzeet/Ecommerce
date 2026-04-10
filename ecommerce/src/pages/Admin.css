@@ -310,6 +310,51 @@
 .modal-text { font-size: 14px; color: #64748b; margin-bottom: 24px; }
 .modal-actions { display: flex; gap: 10px; }
 
+/* ── Category Manager ── */
+.cat-add-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.cat-add-row .form-input { flex: 1; }
+
+.cat-count-badge {
+  background: #eef2ff;
+  color: #4f46e5;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.cat-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cat-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  transition: border-color 0.15s, background 0.15s;
+}
+.cat-card:hover { background: #f1f5f9; border-color: #cbd5e1; }
+
+.cat-card-left { display: flex; align-items: center; gap: 14px; }
+.cat-icon { font-size: 20px; }
+.cat-name { font-weight: 600; color: #1e293b; font-size: 15px; display: block; }
+.cat-product-count { font-size: 12px; color: #64748b; margin-top: 2px; display: block; }
+
+.form-select { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+
+.form-hint { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+.link-btn { background: none; border: none; color: #4f46e5; font-size: 12px; cursor: pointer; text-decoration: underline; padding: 0; font-family: inherit; }
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .admin-sidebar { display: none; }
