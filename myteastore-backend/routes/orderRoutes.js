@@ -4,6 +4,23 @@ const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const { supabaseAdmin } = require("../config/supabase");
 
+// GET /api/orders/my?email=xxx  — list orders for a specific user
+router.get("/my", async (req, res) => {
+  const { email } = req.query;
+  if (!email) return res.status(400).json({ message: "Email is required" });
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("orders")
+      .select("*")
+      .eq("customer_email", email)
+      .order("created_at", { ascending: false });
+    if (error) return res.status(500).json({ message: error.message });
+    res.json(data || []);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // GET /api/orders  — list all orders for admin dashboard
 router.get("/", async (req, res) => {
   try {

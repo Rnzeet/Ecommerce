@@ -39,9 +39,22 @@ function Checkout() {
   const [success, setSuccess] = useState(null); // { orderId, paymentId }
 
   const [form, setForm] = useState({
-    name: "", email: "", phone: "",
+    name: user?.user_metadata?.full_name || "",
+    email: user?.email || "",
+    phone: "",
     address: "", city: "", state: "", pincode: "",
   });
+
+  // Keep email/name in sync if user loads after initial render
+  useEffect(() => {
+    if (user) {
+      setForm(f => ({
+        ...f,
+        name: f.name || user.user_metadata?.full_name || "",
+        email: f.email || user.email || "",
+      }));
+    }
+  }, [user]);
 
   const shipping = totalPrice > 499 ? 0 : 49;
   const finalTotal = totalPrice + shipping;
@@ -179,7 +192,14 @@ function Checkout() {
 
               <div className="chk-field">
                 <label>Email *</label>
-                <input name="email" type="email" placeholder="you@example.com" value={form.email} onChange={handleChange} />
+                <input
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  readOnly={!!user?.email}
+                  style={user?.email ? { background: "#f3f4f6", color: "#6b7280", cursor: "not-allowed" } : {}}
+                />
               </div>
 
               <div className="chk-field">

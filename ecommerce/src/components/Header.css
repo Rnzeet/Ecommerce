@@ -108,6 +108,25 @@
   white-space: nowrap;
 }
 
+.my-orders-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid #facc15;
+  border-radius: 4px;
+  color: #facc15;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.my-orders-btn:hover {
+  background: #facc15;
+  color: #1a1a1a;
+}
+
 .signout-btn {
   padding: 4px 10px;
   background: transparent;

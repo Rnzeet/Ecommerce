@@ -49,6 +49,7 @@ function Header() {
             <span className="header-username">
               {user.user_metadata?.full_name?.split(" ")[0] || "User"}
             </span>
+            <Link to="/orders" className="my-orders-btn" onClick={() => setMenuOpen(false)}>My Orders</Link>
             <button className="signout-btn" onClick={handleSignOut}>Sign out</button>
           </div>
         ) : (
