@@ -28,6 +28,8 @@ function Admin() {
       return JSON.parse(localStorage.getItem(CATEGORIES_KEY)) || [];
     } catch { return []; }
   });
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
   const [form, setForm] = useState({
     name: "", price: "", image: "", category: "", description: "", imageName: "",
   });
@@ -53,7 +55,19 @@ function Admin() {
     }
   };
 
-  useEffect(() => { fetchProducts(); fetchBanners(); }, []);
+  useEffect(() => { fetchProducts(); fetchBanners(); fetchOrders(); }, []);
+
+  const fetchOrders = async () => {
+    setOrdersLoading(true);
+    try {
+      const res = await axios.get(`${API}/api/orders`);
+      setOrders(res.data || []);
+    } catch {
+      // silent — orders table may not exist yet
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
 
   const fetchBanners = async () => {
     try {
@@ -219,7 +233,14 @@ function Admin() {
           <span className="logo-text">MyTeaStore</span>
         </div>
         <nav className="sidebar-nav">
-          <div className="nav-label">MANAGEMENT</div>
+          <div className="nav-label">OVERVIEW</div>
+          <div className={`nav-item ${activeTab === "dashboard" ? "active" : ""}`} onClick={() => setActiveTab("dashboard")}>
+            <span className="nav-icon">📊</span> Dashboard
+          </div>
+          <div className={`nav-item ${activeTab === "orders" ? "active" : ""}`} onClick={() => setActiveTab("orders")}>
+            <span className="nav-icon">📋</span> Orders
+          </div>
+          <div className="nav-label" style={{ marginTop: 12 }}>MANAGEMENT</div>
           <div className={`nav-item ${activeTab === "products" ? "active" : ""}`} onClick={() => setActiveTab("products")}>
             <span className="nav-icon">📦</span> Products
           </div>
@@ -241,8 +262,12 @@ function Admin() {
         {/* Topbar */}
         <header className="admin-topbar">
           <div>
-            <h1 className="topbar-title">{activeTab === "categories" ? "Category Management" : activeTab === "banners" ? "Banner Management" : "Product Management"}</h1>
-            <p className="topbar-sub">{activeTab === "categories" ? "Manage store categories" : activeTab === "banners" ? "Upload and manage homepage banners" : "Manage your store inventory"}</p>
+            <h1 className="topbar-title">
+              {activeTab === "dashboard" ? "Dashboard" : activeTab === "orders" ? "Orders" : activeTab === "categories" ? "Category Management" : activeTab === "banners" ? "Banner Management" : "Product Management"}
+            </h1>
+            <p className="topbar-sub">
+              {activeTab === "dashboard" ? "Store overview and revenue statistics" : activeTab === "orders" ? "View all customer orders" : activeTab === "categories" ? "Manage store categories" : activeTab === "banners" ? "Upload and manage homepage banners" : "Manage your store inventory"}
+            </p>
           </div>
           <div className="topbar-stats">
             <div className="stat-chip">
@@ -255,6 +280,167 @@ function Admin() {
             </div>
           </div>
         </header>
+
+        {/* ── DASHBOARD TAB ── */}
+        {activeTab === "dashboard" && (() => {
+          const totalRevenue = orders.reduce((s, o) => s + (parseFloat(o.total_amount) || 0), 0);
+          const paidOrders = orders.filter(o => o.status === "paid");
+          const avgOrder = paidOrders.length ? totalRevenue / paidOrders.length : 0;
+          // Top products by revenue
+          const productMap = {};
+          orders.forEach(o => {
+            (o.items || []).forEach(item => {
+              const k = item.name || item.id;
+              if (!productMap[k]) productMap[k] = { name: k, qty: 0, revenue: 0 };
+              productMap[k].qty += item.quantity || 1;
+              productMap[k].revenue += (item.price || 0) * (item.quantity || 1);
+            });
+          });
+          const topProducts = Object.values(productMap).sort((a, b) => b.revenue - a.revenue).slice(0, 5);
+          return (
+            <>
+              {/* Stat cards */}
+              <div className="dash-stats-grid">
+                <div className="dash-stat-card">
+                  <div className="dash-stat-icon" style={{ background: "#eef2ff" }}>💰</div>
+                  <div>
+                    <p className="dash-stat-label">Total Revenue</p>
+                    <p className="dash-stat-value">₹{totalRevenue.toLocaleString("en-IN")}</p>
+                  </div>
+                </div>
+                <div className="dash-stat-card">
+                  <div className="dash-stat-icon" style={{ background: "#f0fdf4" }}>📋</div>
+                  <div>
+                    <p className="dash-stat-label">Total Orders</p>
+                    <p className="dash-stat-value">{orders.length}</p>
+                  </div>
+                </div>
+                <div className="dash-stat-card">
+                  <div className="dash-stat-icon" style={{ background: "#fff7ed" }}>📦</div>
+                  <div>
+                    <p className="dash-stat-label">Products Listed</p>
+                    <p className="dash-stat-value">{products.length}</p>
+                  </div>
+                </div>
+                <div className="dash-stat-card">
+                  <div className="dash-stat-icon" style={{ background: "#fdf4ff" }}>🧾</div>
+                  <div>
+                    <p className="dash-stat-label">Avg Order Value</p>
+                    <p className="dash-stat-value">₹{avgOrder.toFixed(0)}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent orders + top products */}
+              <div className="dash-bottom-grid">
+                <section className="admin-card">
+                  <div className="card-header"><h2 className="card-title">Recent Orders</h2>
+                    <button className="btn btn-sm btn-ghost" onClick={() => setActiveTab("orders")}>View All →</button>
+                  </div>
+                  {orders.length === 0 ? (
+                    <p className="empty-row">No orders yet.</p>
+                  ) : (
+                    <div className="table-wrap">
+                      <table className="admin-table">
+                        <thead><tr><th>Customer</th><th>Amount</th><th>Items</th><th>Status</th><th>Date</th></tr></thead>
+                        <tbody>
+                          {orders.slice(0, 5).map(o => (
+                            <tr key={o.id}>
+                              <td><span className="product-name">{o.customer_name || "—"}</span><p className="product-desc">{o.customer_email}</p></td>
+                              <td className="price-cell">₹{parseFloat(o.total_amount || 0).toLocaleString("en-IN")}</td>
+                              <td>{(o.items || []).length} item{(o.items || []).length !== 1 ? "s" : ""}</td>
+                              <td><span className="order-status-badge order-status-paid">{o.status}</span></td>
+                              <td className="order-date">{o.created_at ? new Date(o.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </section>
+
+                <section className="admin-card">
+                  <div className="card-header"><h2 className="card-title">Top Products</h2></div>
+                  {topProducts.length === 0 ? (
+                    <p className="empty-row">No sales data yet.</p>
+                  ) : (
+                    <div className="top-products-list">
+                      {topProducts.map((p, i) => {
+                        const maxRev = topProducts[0].revenue;
+                        const pct = maxRev ? Math.round((p.revenue / maxRev) * 100) : 0;
+                        return (
+                          <div key={p.name} className="top-product-row">
+                            <span className="top-product-rank">#{i + 1}</span>
+                            <div className="top-product-info">
+                              <div className="top-product-name-row">
+                                <span className="top-product-name">{p.name}</span>
+                                <span className="top-product-revenue">₹{p.revenue.toLocaleString("en-IN")}</span>
+                              </div>
+                              <div className="top-product-bar-wrap">
+                                <div className="top-product-bar" style={{ width: `${pct}%` }} />
+                              </div>
+                              <span className="top-product-qty">{p.qty} sold</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </section>
+              </div>
+            </>
+          );
+        })()}
+
+        {/* ── ORDERS TAB ── */}
+        {activeTab === "orders" && (
+          <section className="admin-card">
+            <div className="card-header">
+              <h2 className="card-title">All Orders</h2>
+              <span className="cat-count-badge">{orders.length} total</span>
+            </div>
+            {ordersLoading ? (
+              <p className="empty-row">Loading orders...</p>
+            ) : orders.length === 0 ? (
+              <p className="empty-row">No orders yet. Orders will appear here after successful payments.</p>
+            ) : (
+              <div className="table-wrap">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Order ID</th>
+                      <th>Customer</th>
+                      <th>Contact</th>
+                      <th>Address</th>
+                      <th>Items</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders.map(o => (
+                      <tr key={o.id}>
+                        <td><code className="order-id-code">{(o.razorpay_order_id || "").slice(-10)}</code></td>
+                        <td><span className="product-name">{o.customer_name || "—"}</span><p className="product-desc">{o.customer_email}</p></td>
+                        <td className="order-date">{o.customer_phone || "—"}</td>
+                        <td><p className="product-desc" style={{ maxWidth: 180 }}>{o.delivery_address || "—"}</p></td>
+                        <td>
+                          {(o.items || []).map((item, i) => (
+                            <div key={i} className="order-item-chip">{item.name} × {item.quantity}</div>
+                          ))}
+                        </td>
+                        <td className="price-cell">₹{parseFloat(o.total_amount || 0).toLocaleString("en-IN")}</td>
+                        <td><span className={`order-status-badge order-status-${o.status}`}>{o.status}</span></td>
+                        <td className="order-date">{o.created_at ? new Date(o.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
 
         {/* ── CATEGORIES TAB ── */}
         {activeTab === "categories" && (

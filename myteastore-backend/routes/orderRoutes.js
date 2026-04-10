@@ -2,6 +2,21 @@ const express = require("express");
 const router = express.Router();
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
+const { supabaseAdmin } = require("../config/supabase");
+
+// GET /api/orders  — list all orders for admin dashboard
+router.get("/", async (req, res) => {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("orders")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) return res.status(500).json({ message: error.message });
+    res.json(data || []);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 // POST /api/orders/create  — create a Razorpay order
 router.post("/create", async (req, res) => {
@@ -29,9 +44,12 @@ router.post("/create", async (req, res) => {
   }
 });
 
-// POST /api/orders/verify  — verify Razorpay payment signature
-router.post("/verify", (req, res) => {
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+// POST /api/orders/verify  — verify Razorpay payment signature and save order
+router.post("/verify", async (req, res) => {
+  const {
+    razorpay_order_id, razorpay_payment_id, razorpay_signature,
+    customerInfo, items, totalAmount,
+  } = req.body;
   if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
     return res.status(400).json({ success: false, message: "Missing payment fields" });
   }
@@ -40,11 +58,30 @@ router.post("/verify", (req, res) => {
     .update(`${razorpay_order_id}|${razorpay_payment_id}`)
     .digest("hex");
 
-  if (expectedSignature === razorpay_signature) {
-    res.json({ success: true, paymentId: razorpay_payment_id });
-  } else {
-    res.status(400).json({ success: false, message: "Payment verification failed" });
+  if (expectedSignature !== razorpay_signature) {
+    return res.status(400).json({ success: false, message: "Payment verification failed" });
   }
+
+  // Save order to Supabase (best-effort — don't fail payment if DB insert fails)
+  try {
+    await supabaseAdmin.from("orders").insert({
+      razorpay_order_id,
+      razorpay_payment_id,
+      customer_name: customerInfo?.name || null,
+      customer_email: customerInfo?.email || null,
+      customer_phone: customerInfo?.phone || null,
+      delivery_address: customerInfo?.address
+        ? `${customerInfo.address}, ${customerInfo.city || ""}, ${customerInfo.state || ""} - ${customerInfo.pincode || ""}`.replace(/, ,/g, ",").trim()
+        : null,
+      items: items || [],
+      total_amount: totalAmount || 0,
+      status: "paid",
+    });
+  } catch (dbErr) {
+    console.error("Order DB save failed (non-fatal):", dbErr.message);
+  }
+
+  res.json({ success: true, paymentId: razorpay_payment_id });
 });
 
 module.exports = router;

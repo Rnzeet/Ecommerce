@@ -76,7 +76,12 @@ function Checkout() {
         order_id: order.id,
         handler: async (response) => {
           try {
-            const { data } = await axios.post(`${API}/api/orders/verify`, response);
+            const { data } = await axios.post(`${API}/api/orders/verify`, {
+              ...response,
+              customerInfo: form,
+              items: cart.map(i => ({ id: i.id, name: i.title || i.name, price: i.price, quantity: i.quantity, category: i.category })),
+              totalAmount: finalTotal,
+            });
             if (data.success) {
               clearCart();
               setSuccess({ orderId: order.id, paymentId: data.paymentId });
