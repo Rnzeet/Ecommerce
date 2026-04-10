@@ -28,6 +28,11 @@ function Header() {
           <li><Link to="/" onClick={() => setMenuOpen(false)}>Home</Link></li>
           <li><Link to="/products" onClick={() => setMenuOpen(false)}>Products</Link></li>
           <li><Link to="/about" onClick={() => setMenuOpen(false)}>About</Link></li>
+          {user && (
+            <li className="nav-signout-item">
+              <button className="nav-signout-btn" onClick={() => { setMenuOpen(false); handleSignOut(); }}>Sign out</button>
+            </li>
+          )}
         </ul>
       </nav>
 

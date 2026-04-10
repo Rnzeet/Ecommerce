@@ -188,6 +188,31 @@
   max-width: 100%;
   overflow-x: hidden;
 } */
+/* Hidden on desktop, shown on mobile via the media query below */
+.nav-signout-item {
+  display: none;
+}
+
+.nav-signout-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 25px;
+  font-weight: normal;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.3s;
+  text-align: left;
+  display: block;
+  width: 100%;
+}
+
+.nav-signout-btn:hover {
+  color: #facc15;
+  background: transparent;
+  border-color: transparent;
+}
+
 /* 📱 Mobile View */
 @media (max-width: 768px) {
 
@@ -213,5 +238,14 @@
 
   .menu-icon {
     display: block;
+  }
+
+  /* Show sign-out in hamburger, hide it from the desktop header-user row */
+  .header-user .signout-btn {
+    display: none;
+  }
+
+  .nav-signout-item {
+    display: list-item;
   }
 }
