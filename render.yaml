@@ -13,4 +13,4 @@ services:
       - key: REACT_APP_SUPABASE_ANON_KEY
         value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5vbHB5eXZud3l2enF5aGtjc2N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MTIxOTMsImV4cCI6MjA4ODI4ODE5M30.YiVXu09MvVJo-0zMMBocgf2U_WpwlTS14wbcJz0vSGc
       - key: SUPABASE_SERVICE_ROLE_KEY
-        value: your_service_role_key_here
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5vbHB5eXZud3l2enF5aGtjc2N0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjcxMjE5MywiZXhwIjoyMDg4Mjg4MTkzfQ.MTtXBgGPqwBHpDVoyZLm78F6T6HKcUSmNZbma1hqTVQ

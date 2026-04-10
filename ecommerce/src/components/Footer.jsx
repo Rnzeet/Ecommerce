@@ -7,7 +7,7 @@ function Footer() {
       <div className="footer-container">
         
         <div className="footer-section">
-          <h2 className="footer-logo">SurpiStore</h2>
+          <h2 className="footer-logo">Tea Store</h2>
           <p>Your one-stop shop for quality products.</p>
         </div>
 
@@ -23,7 +23,7 @@ function Footer() {
 
         <div className="footer-section">
           <h3>Contact</h3>
-          <p>Email: support@surpistore.com</p>
+          <p>Email: support@Teastore.com</p>
           <p>Phone: +91 98765 43210</p>
         </div>
 
@@ -39,7 +39,7 @@ function Footer() {
       </div>
 
       <div className="footer-bottom">
-        © {new Date().getFullYear()} SurpiStore. All rights reserved.
+        © {new Date().getFullYear()} TeaStore. All rights reserved.
       </div>
     </footer>
   );
