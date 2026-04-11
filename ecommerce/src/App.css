@@ -28,7 +28,7 @@
 }
 @media (max-width: 768px) {
   main {
-    margin-top: 100px; /* adjust for mobile header height */
+    margin-top:  100px; /* adjust for mobile header height */
   }
 }
 
