@@ -88,13 +88,21 @@ function Header() {
         {/* User area */}
         {user ? (
           <div className="header-user">
-            {user.user_metadata?.avatar_url && (
-              <img
-                src={user.user_metadata.avatar_url}
-                alt={user.user_metadata?.full_name || "User"}
-                className="header-avatar"
-              />
-            )}
+            <div className="header-avatar-wrap" title={user.user_metadata?.full_name || "User"}>
+              {user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
+                <img
+                  src={user.user_metadata.avatar_url || user.user_metadata.picture}
+                  alt={user.user_metadata?.full_name || "User"}
+                  className="header-avatar"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <span className="header-avatar-initial">
+                  {(user.user_metadata?.full_name || user.email || "U")[0].toUpperCase()}
+                </span>
+              )}
+              <span className="header-avatar-online" />
+            </div>
             <span className="header-username">
               {user.user_metadata?.full_name?.split(" ")[0] || "User"}
             </span>

@@ -156,13 +156,46 @@
   gap: 8px;
 }
 
+.header-avatar-wrap {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  cursor: default;
+}
+
 .header-avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #43a047;
-  flex-shrink: 0;
+  display: block;
+}
+
+.header-avatar-initial {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2e7d32, #43a047);
+  border: 2px solid #43a047;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+
+/* Green "online" dot */
+.header-avatar-online {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 9px;
+  height: 9px;
+  background: #4caf50;
+  border: 2px solid #0b121e;
+  border-radius: 50%;
 }
 
 .header-username {
