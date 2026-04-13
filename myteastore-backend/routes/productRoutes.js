@@ -10,6 +10,15 @@ router.post("/upload-image", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No file provided" });
 
+    // Guard: service role key must be present for storage uploads
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error("[upload-image] SUPABASE_SERVICE_ROLE_KEY is not set. Set it in Render → Environment.");
+      return res.status(500).json({
+        message: "Server misconfiguration: SUPABASE_SERVICE_ROLE_KEY is missing.",
+        hint: "Add SUPABASE_SERVICE_ROLE_KEY to your Render service environment variables.",
+      });
+    }
+
     // Sanitize filename
     const ext = req.file.originalname.split(".").pop().toLowerCase();
     const filename = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
@@ -55,11 +64,10 @@ router.get("/", async (req, res) => {
 // POST /add-product -> add new product
 router.post("/add-product", async (req, res) => {
   try {
-    const { name, price, image, category, description } = req.body;
+    const { name, price, image, category, description, weight } = req.body;
     if (!name || price === undefined || price === "") {
       return res.status(400).json({ message: "Name and price are required" });
     }
-    const { name, price, image, category, description, weight } = req.body;
     const { data, error } = await supabase
       .from("products")
       .insert([{ name, price: parseFloat(price), image, category, description, weight: weight || null }])
