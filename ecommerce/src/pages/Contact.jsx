@@ -1,24 +1,32 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import Footer from "../components/Footer";
 import "./Contact.css";
+
+const API = import.meta.env.VITE_API_URL;
 
 function Contact() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate sending (replace with real email API if needed)
-    setTimeout(() => {
-      setLoading(false);
+    setError("");
+    try {
+      await axios.post(`${API}/api/contact`, form);
       setSubmitted(true);
-    }, 1200);
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to send message. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -103,6 +111,7 @@ function Contact() {
               <button type="submit" className="contact-btn" disabled={loading}>
                 {loading ? "Sending..." : "Send Message →"}
               </button>
+              {error && <p style={{ color: "#ef9a9a", textAlign: "center", marginTop: 12, fontSize: 14 }}>{error}</p>}
             </form>
           )}
         </div>

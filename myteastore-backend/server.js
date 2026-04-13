@@ -9,6 +9,7 @@ const bannerRoutes = require("./routes/bannerRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const couponRoutes = require("./routes/couponRoutes");
+const contactRoutes = require("./routes/contactRoutes");
 const authRoutes = require("./models/auth");
 
 const app = express();
@@ -25,6 +26,7 @@ app.use("/api/banners", bannerRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/coupons", couponRoutes);
+app.use("/api/contact", contactRoutes);
 app.use("/auth", authRoutes);
 
 app.get("/", (req, res) => {
