@@ -1,38 +1,14 @@
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import "./Cart.css";
 
-const COUPON_CODES = { TEA10: 0.10, SAVE20: 0.20 };
-
 function Cart() {
-  const { cart, increaseQty, decreaseQty, totalPrice, clearCart } = useCart();
+  const { cart, increaseQty, decreaseQty, totalPrice, clearCart,
+          couponCode, setCouponCode, discount, couponApplied, couponMsg,
+          applyCoupon, removeCoupon } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const [coupon, setCoupon] = useState("");
-  const [discount, setDiscount] = useState(0);
-  const [couponMsg, setCouponMsg] = useState(null);
-  const [couponApplied, setCouponApplied] = useState("");
-
-  const applyCoupon = () => {
-    const code = coupon.trim().toUpperCase();
-    if (COUPON_CODES[code]) {
-      const saving = totalPrice * COUPON_CODES[code];
-      setDiscount(saving);
-      setCouponApplied(code);
-      setCouponMsg({ type: "success", text: `"${code}" applied — you save ₹${saving.toFixed(0)}!` });
-    } else {
-      setDiscount(0);
-      setCouponApplied("");
-      setCouponMsg({ type: "error", text: "Invalid coupon code" });
-    }
-  };
-
-  const removeCoupon = () => {
-    setDiscount(0);
-    setCoupon("");
-    setCouponApplied("");
-    setCouponMsg(null);
-  };
 
   const shipping = totalPrice > 499 ? 0 : 49;
   const finalTotal = totalPrice - discount + shipping;
@@ -102,12 +78,12 @@ function Cart() {
               <div className="coupon-row">
                 <input
                   className="coupon-input"
-                  placeholder="e.g. TEA10"
-                  value={coupon}
-                  onChange={e => setCoupon(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && applyCoupon()}
+                  placeholder="e.g. NEW10, TEA10"
+                  value={couponCode}
+                  onChange={e => setCouponCode(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && applyCoupon(couponCode, user?.email)}
                 />
-                <button className="coupon-apply-btn" onClick={applyCoupon}>Apply</button>
+                <button className="coupon-apply-btn" onClick={() => applyCoupon(couponCode, user?.email)}>Apply</button>
               </div>
             )}
             {couponMsg && (

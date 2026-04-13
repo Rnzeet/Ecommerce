@@ -22,7 +22,7 @@ function loadRazorpayScript() {
 const STEPS = ["Delivery", "Payment"];
 
 function Checkout() {
-  const { cart, totalPrice, clearCart } = useCart();
+  const { cart, totalPrice, clearCart, discount, couponApplied } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -57,7 +57,7 @@ function Checkout() {
   }, [user]);
 
   const shipping = totalPrice > 499 ? 0 : 49;
-  const finalTotal = totalPrice + shipping;
+  const finalTotal = totalPrice - discount + shipping;
   const itemCount = cart.reduce((s, i) => s + i.quantity, 0);
 
   const handleChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -105,6 +105,10 @@ function Checkout() {
               totalAmount: finalTotal,
             });
             if (data.success) {
+              // Mark one-time coupons as used
+              if (couponApplied) {
+                axios.post(`${API}/api/coupons/mark-used`, { code: couponApplied, userEmail: form.email }).catch(() => {});
+              }
               clearCart();
               setSuccess({ orderId: order.id, paymentId: data.paymentId });
             } else {
