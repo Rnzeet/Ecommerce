@@ -8,13 +8,21 @@
 }
 
 /* ── Category Filter Bar ── */
+.filter-sort-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+  padding: 0 20px 8px;
+  margin-bottom: 12px;
+}
+
 .category-filter-bar {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  justify-content: center;
-  padding: 0 20px 8px;
-  margin-bottom: 12px;
 }
 
 .filter-tab {
@@ -50,6 +58,24 @@
   color: white;
   transform: translateY(-1px);
 }
+
+/* Sort dropdown */
+.sort-select {
+  padding: 9px 14px;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.14);
+  border-radius: 10px;
+  color: rgba(255,255,255,0.8);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+.sort-select:focus { border-color: #43a047; }
+.sort-select option { background: #1a2535; color: #fff; }
 
 /* ── Search result count ── */
 .search-results-count {

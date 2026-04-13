@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { FaShoppingCart, FaBars, FaTimes } from "react-icons/fa";
+import { FaShoppingCart, FaBars, FaTimes, FaHeart } from "react-icons/fa";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import { useWishlist } from "../context/WishlistContext";
 import "./Header.css";
 
 const NAV_ITEMS = [
@@ -16,6 +17,7 @@ function Header() {
   const [scrolled, setScrolled] = useState(false);
   const { cart } = useCart();
   const { user, signOut } = useAuth();
+  const { wishlist } = useWishlist();
   const navigate = useNavigate();
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
@@ -79,6 +81,12 @@ function Header() {
 
       {/* Right actions */}
       <div className="header-actions">
+        {/* Wishlist */}
+        <Link to="/wishlist" className="header-cart" aria-label="Wishlist" onClick={close}>
+          <FaHeart />
+          {wishlist.length > 0 && <span className="header-cart-badge">{wishlist.length}</span>}
+        </Link>
+
         {/* Cart */}
         <Link to="/cart" className="header-cart" aria-label="Cart" onClick={close}>
           <FaShoppingCart />

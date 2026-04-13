@@ -4,12 +4,20 @@ import axios from "axios";
 import "./ProductList.css";
 import ProductCard from "./ProductCard";
 
+const SORT_OPTIONS = [
+  { value: "default", label: "Featured" },
+  { value: "price-asc", label: "Price: Low → High" },
+  { value: "price-desc", label: "Price: High → Low" },
+  { value: "name-asc", label: "Name: A → Z" },
+];
+
 function ProductList({ limit, search = "" }) {
   const [products, setProducts] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState(
     () => searchParams.get("category") || "All"
   );
+  const [sort, setSort] = useState("default");
 
   const API = import.meta.env.VITE_API_URL 
 
@@ -52,22 +60,41 @@ function ProductList({ limit, search = "" }) {
       )
     : filtered;
 
-  const displayed = limit ? searched.slice(0, limit) : searched;
+  const displayed = limit ? searched.slice(0, limit) : sortProducts(searched, sort);
+
+  function sortProducts(list, sortVal) {
+    const copy = [...list];
+    if (sortVal === "price-asc")  return copy.sort((a, b) => a.price - b.price);
+    if (sortVal === "price-desc") return copy.sort((a, b) => b.price - a.price);
+    if (sortVal === "name-asc")   return copy.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+    return copy;
+  }
 
   return (
     <div className="product-list-wrapper">
-      {/* Category Filter Tabs — hidden when limit is set (e.g. home page) */}
+      {/* Category Filter Tabs + Sort — hidden when limit is set (e.g. home page) */}
       {!limit && categories.length > 1 && (
-        <div className="category-filter-bar">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              className={`filter-tab ${activeCategory === cat ? "filter-tab-active" : ""}`}
-              onClick={() => handleTabClick(cat)}
-            >
-              {cat}
-            </button>
-          ))}
+        <div className="filter-sort-bar">
+          <div className="category-filter-bar">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                className={`filter-tab ${activeCategory === cat ? "filter-tab-active" : ""}`}
+                onClick={() => handleTabClick(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          <select
+            className="sort-select"
+            value={sort}
+            onChange={e => setSort(e.target.value)}
+          >
+            {SORT_OPTIONS.map(o => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
         </div>
       )}
 
@@ -89,4 +116,3 @@ function ProductList({ limit, search = "" }) {
 }
 
 export default ProductList;
-

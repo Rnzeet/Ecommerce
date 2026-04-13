@@ -12,8 +12,10 @@ import AdminLogin from "./pages/AdminLogin";
 import Login from "./pages/Login";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Wishlist from "./pages/Wishlist";
 import OrderHistory from "./pages/OrderHistory";
 import ProtectedRoute from "./components/ProtectedRoute";
+import FloatingActions from "./components/FloatingActions";
 
 // Hide header on admin pages
 function AppContent() {
@@ -34,6 +36,7 @@ function AppContent() {
           <Route path="/login" element={<Login />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/orders" element={<OrderHistory />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/admin-login" element={<AdminLogin />} />
@@ -53,6 +56,7 @@ function AppContent() {
         autoClose={2000}
         theme="colored"
       />
+      {!isAdminPage && <FloatingActions />}
     </>
   );
 }
