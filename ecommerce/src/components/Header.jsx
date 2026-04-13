@@ -1,72 +1,125 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaShoppingCart, FaBars, FaTimes } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import "./Header.css";
 
+const NAV_ITEMS = [
+  { to: "/", label: "Home", exact: true },
+  { to: "/products", label: "Products" },
+  { to: "/about", label: "About" },
+];
+
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { cart } = useCart();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Close menu on resize to desktop
+  useEffect(() => {
+    const onResize = () => { if (window.innerWidth > 768) setMenuOpen(false); };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
   const handleSignOut = async () => {
+    setMenuOpen(false);
     await signOut();
     navigate("/");
   };
 
+  const close = () => setMenuOpen(false);
+
   return (
-    <header className="header">
-      <Link to="/" className="logo">
-        TeaStore
+    <header className={`header${scrolled ? " header--scrolled" : ""}`}>
+
+      {/* Brand */}
+      <Link to="/" className="header-logo" onClick={close}>
+        <span className="header-logo-icon">🍵</span>
+        <span className="header-logo-text">MyTeaStore</span>
       </Link>
 
-      <nav className={`nav ${menuOpen ? "active" : ""}`}>
-        <ul className="nav-links">
-          <li><Link to="/" onClick={() => setMenuOpen(false)}>Home</Link></li>
-          <li><Link to="/products" onClick={() => setMenuOpen(false)}>Products</Link></li>
-          <li><Link to="/about" onClick={() => setMenuOpen(false)}>About</Link></li>
+      {/* Desktop nav */}
+      <nav className={`header-nav${menuOpen ? " header-nav--open" : ""}`}>
+        <ul className="header-nav-list">
+          {NAV_ITEMS.map(({ to, label, exact }) => (
+            <li key={to}>
+              <NavLink
+                to={to}
+                end={exact}
+                className={({ isActive }) =>
+                  "header-nav-link" + (isActive ? " header-nav-link--active" : "")
+                }
+                onClick={close}
+              >
+                {label}
+              </NavLink>
+            </li>
+          ))}
+          {/* Sign out inside hamburger menu (mobile only) */}
           {user && (
-            <li className="nav-signout-item">
-              <button className="nav-signout-btn" onClick={() => { setMenuOpen(false); handleSignOut(); }}>Sign out</button>
+            <li className="header-nav-signout">
+              <button className="header-nav-signout-btn" onClick={handleSignOut}>
+                Sign out
+              </button>
             </li>
           )}
         </ul>
       </nav>
 
-      <div className="right-section">
-        <Link to="/cart" className="cart">
+      {/* Right actions */}
+      <div className="header-actions">
+        {/* Cart */}
+        <Link to="/cart" className="header-cart" aria-label="Cart" onClick={close}>
           <FaShoppingCart />
-          <span className="cart-count">{cartCount}</span>
+          {cartCount > 0 && <span className="header-cart-badge">{cartCount}</span>}
         </Link>
 
+        {/* User area */}
         {user ? (
           <div className="header-user">
             {user.user_metadata?.avatar_url && (
               <img
                 src={user.user_metadata.avatar_url}
-                alt="avatar"
+                alt={user.user_metadata?.full_name || "User"}
                 className="header-avatar"
               />
             )}
             <span className="header-username">
               {user.user_metadata?.full_name?.split(" ")[0] || "User"}
             </span>
-            <Link to="/orders" className="my-orders-btn" onClick={() => setMenuOpen(false)}>My Orders</Link>
-            <button className="signout-btn" onClick={handleSignOut}>Sign out</button>
+            <Link to="/orders" className="header-orders-btn" onClick={close}>My Orders</Link>
+            <button className="header-signout-btn" onClick={handleSignOut}>Sign out</button>
           </div>
         ) : (
-          <Link to="/login" className="login-btn">Login</Link>
+          <Link to="/login" className="header-login-btn" onClick={close}>Sign in</Link>
         )}
 
-        <div className="menu-icon" onClick={() => setMenuOpen(!menuOpen)}>
+        {/* Hamburger */}
+        <button
+          className="header-hamburger"
+          onClick={() => setMenuOpen(o => !o)}
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+        >
           {menuOpen ? <FaTimes /> : <FaBars />}
-        </div>
+        </button>
       </div>
+
+      {/* Mobile overlay */}
+      {menuOpen && <div className="header-overlay" onClick={close} />}
     </header>
   );
 }
 
 export default Header;
+

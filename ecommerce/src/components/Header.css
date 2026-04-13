@@ -1,16 +1,306 @@
-* {
+/* ══════════════════════════════
+   HEADER — Production
+══════════════════════════════ */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(20px, 4vw, 60px);
+  height: 70px;
+  background: rgba(11, 18, 30, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: background 0.3s, box-shadow 0.3s, height 0.3s;
+}
+
+.header--scrolled {
+  background: rgba(10, 16, 26, 0.96);
+  box-shadow: 0 4px 32px rgba(0,0,0,0.4);
+  height: 62px;
+}
+
+/* ── Brand ── */
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.header-logo-icon { font-size: 1.45rem; line-height: 1; }
+
+.header-logo-text {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+
+/* ── Nav ── */
+.header-nav { display: flex; }
+
+.header-nav-list {
+  list-style: none;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
-.nav-links {
-  display:flex;
-  list-style: none;
-  gap: 30px;
-  font-size: 25px;
 
-
+.header-nav-link {
+  display: inline-block;
+  padding: 6px 14px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+  position: relative;
 }
+
+.header-nav-link:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.07);
+}
+
+.header-nav-link--active {
+  color: #81c784;
+}
+
+.header-nav-link--active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  background: #43a047;
+  border-radius: 2px;
+}
+
+/* Mobile-only sign-out inside nav (hidden on desktop) */
+.header-nav-signout { display: none; }
+
+.header-nav-signout-btn {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.65);
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+.header-nav-signout-btn:hover {
+  color: #ef9a9a;
+  background: rgba(239,154,154,0.08);
+}
+
+/* ── Right actions ── */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Cart */
+.header-cart {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: rgba(255,255,255,0.75);
+  font-size: 1.1rem;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: color 0.2s, background 0.2s;
+}
+.header-cart:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.08);
+}
+
+.header-cart-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #43a047;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 17px;
+  height: 17px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  padding: 0 3px;
+  line-height: 1;
+}
+
+/* User area */
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #43a047;
+  flex-shrink: 0;
+}
+
+.header-username {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-orders-btn {
+  padding: 5px 13px;
+  border: 1.5px solid rgba(129,199,132,0.5);
+  border-radius: 8px;
+  color: #81c784;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+.header-orders-btn:hover {
+  background: rgba(129,199,132,0.12);
+  border-color: #81c784;
+  color: #a5d6a7;
+}
+
+.header-signout-btn {
+  padding: 5px 13px;
+  background: transparent;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.55);
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+.header-signout-btn:hover {
+  border-color: rgba(239,154,154,0.4);
+  color: #ef9a9a;
+  background: rgba(239,154,154,0.06);
+}
+
+/* Login */
+.header-login-btn {
+  padding: 7px 18px;
+  background: linear-gradient(135deg, #2e7d32, #43a047);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+.header-login-btn:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+/* Hamburger */
+.header-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.8);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s;
+  margin-left: 2px;
+}
+.header-hamburger:hover { background: rgba(255,255,255,0.08); }
+
+/* ══════════════════════════════
+   MOBILE
+══════════════════════════════ */
+@media (max-width: 768px) {
+  .header-hamburger { display: grid; place-items: center; }
+
+  /* Slide-down drawer */
+  .header-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: rgba(10, 16, 26, 0.98);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+  }
+  .header-nav--open {
+    pointer-events: all;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .header-nav-list {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px 20px 20px;
+    gap: 2px;
+  }
+
+  .header-nav-link {
+    display: block;
+    font-size: 1rem;
+    padding: 10px 14px;
+  }
+
+  .header-nav-link--active::after { display: none; }
+
+  .header-nav-signout { display: list-item; }
+
+  /* Hide desktop sign-out & username on mobile */
+  .header-user .header-signout-btn { display: none; }
+  .header-username { display: none; }
+  .header-orders-btn { font-size: 0.8rem; padding: 5px 10px; }
+}
+
+/* Dim overlay when menu open */
+.header-overlay {
+  position: fixed;
+  inset: 0;
+  top: 70px;
+  background: rgba(0,0,0,0.4);
+  z-index: 999;
+}
+
 
 .header {
   position: fixed;
