@@ -101,7 +101,7 @@ function OrderCard({ order }) {
               <h4 className="oh-section-title" style={{ marginTop: "1.25rem" }}>Payment</h4>
               <p className="oh-meta-row"><span>Payment ID</span><code>{order.razorpay_payment_id}</code></p>
               <p className="oh-meta-row"><span>Order ID</span><code>{order.razorpay_order_id}</code></p>
-              <p className="oh-meta-row"><span>Tracking Number</span><code>{order.tracking_number || "Pending"}</code></p>
+              {/* <p className="oh-meta-row"><span>Tracking Number</span><code>{order.tracking_number || "Pending"}</code></p> */}
               <p className="oh-track-link-row">
                 {/* <Link
                   className="oh-track-link"
