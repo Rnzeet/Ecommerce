@@ -14,6 +14,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Wishlist from "./pages/Wishlist";
 import OrderHistory from "./pages/OrderHistory";
+import TrackOrder from "./pages/TrackOrder";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FloatingActions from "./components/FloatingActions";
 
@@ -38,6 +39,7 @@ function AppContent() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/orders" element={<OrderHistory />} />
+          <Route path="/track" element={<TrackOrder />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route

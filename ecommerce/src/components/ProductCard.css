@@ -152,6 +152,45 @@
   border-color: rgba(239,154,154,0.55);
 }
 
+/* ── Low stock / Out of stock badges ── */
+.low-stock-badge,
+.out-of-stock-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.low-stock-badge {
+  background: rgba(239, 108, 0, 0.92);
+  color: #fff;
+  animation: stock-pulse 2s ease-in-out infinite;
+}
+
+.out-of-stock-badge {
+  background: rgba(30, 30, 30, 0.88);
+  color: rgba(255,255,255,0.55);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+@keyframes stock-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 108, 0, 0.4); }
+  50% { box-shadow: 0 0 0 5px rgba(239, 108, 0, 0); }
+}
+
+.card-add-btn:disabled {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.3);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
 @media (max-width: 600px) {
   .card-img-wrap img { height: 180px; }
   .card-content h3 { font-size: 15px; }

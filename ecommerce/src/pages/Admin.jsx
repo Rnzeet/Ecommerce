@@ -27,7 +27,7 @@ function Admin() {
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [form, setForm] = useState({
-    name: "", price: "", image: "", category: "", description: "", imageName: "", weight: "",
+    name: "", price: "", image: "", category: "", description: "", imageName: "", weight: "", stock: "",
   });
 
   const showToast = (message, type = "success") => {
@@ -67,10 +67,15 @@ function Admin() {
     }
   };
 
-  const updateOrderStatus = async (id, status) => {
+  const [trackingInputs, setTrackingInputs] = useState({});
+
+  const updateOrderStatus = async (id, status, tracking_number) => {
     try {
-      const res = await axios.patch(`${API}/api/orders/${id}/status`, { status });
-      setOrders(prev => prev.map(o => o.id === id ? { ...o, status: res.data.status } : o));
+      const payload = { status };
+      if (tracking_number !== undefined) payload.tracking_number = tracking_number;
+      const res = await axios.patch(`${API}/api/orders/${id}/status`, payload);
+      setOrders(prev => prev.map(o => o.id === id ? { ...o, status: res.data.status, tracking_number: res.data.tracking_number } : o));
+      setTrackingInputs(prev => ({ ...prev, [id]: "" }));
       showToast(`Order marked as "${status}"`);
     } catch (err) {
       showToast(err.response?.data?.message || "Failed to update status", "error");
@@ -134,7 +139,7 @@ function Admin() {
   };
 
   const resetForm = () => {
-    setForm({ name: "", price: "", image: "", category: "", description: "", imageName: "", weight: "" });
+    setForm({ name: "", price: "", image: "", category: "", description: "", imageName: "", weight: "", stock: "" });
     setImageFile(null);
     setImagePreview(null);
     setEditId(null);
@@ -158,7 +163,7 @@ function Admin() {
       }
       const payload = {
         name: form.name, price: form.price, image: imageUrl,
-        category: form.category, description: form.description, weight: form.weight,
+        category: form.category, description: form.description, weight: form.weight, stock: form.stock,
       };
       if (editId) {
         await axios.put(`${API}/api/products/update-product/${editId}`, payload);
@@ -177,7 +182,7 @@ function Admin() {
   };
 
   const handleEdit = (p) => {
-    setForm({ name: p.name, price: p.price, image: p.image, category: p.category, description: p.description || "", imageName: "", weight: p.weight || "" });
+    setForm({ name: p.name, price: p.price, image: p.image, category: p.category, description: p.description || "", imageName: "", weight: p.weight || "", stock: p.stock ?? "" });
     setImagePreview(p.image || null);
     setEditId(p.id);
     setActiveTab("products");
@@ -425,6 +430,7 @@ function Admin() {
                       <th>Items</th>
                       <th>Amount</th>
                       <th>Status</th>
+                      <th>Tracking #</th>
                       <th>Update Status</th>
                       <th>Date</th>
                     </tr>
@@ -451,6 +457,13 @@ function Admin() {
                           <td className="price-cell">₹{parseFloat(o.total_amount || 0).toLocaleString("en-IN")}</td>
                           <td><span className={`order-status-badge order-status-${o.status}`}>{o.status}</span></td>
                           <td>
+                            {o.tracking_number ? (
+                              <code className="order-id-code">{o.tracking_number}</code>
+                            ) : (
+                              <span style={{ color: "#9ca3af", fontSize: "0.78rem" }}>—</span>
+                            )}
+                          </td>
+                          <td>
                             <div className="order-action-btns">
                               {isNew && (
                                 <button className="btn btn-sm order-btn-received" onClick={() => updateOrderStatus(o.id, "received")}>
@@ -458,9 +471,19 @@ function Admin() {
                                 </button>
                               )}
                               {!isNew && canAdvance && nextStatus && (
-                                <button className="btn btn-sm order-btn-advance" onClick={() => updateOrderStatus(o.id, nextStatus)}>
-                                  ▶ {nextStatus.charAt(0).toUpperCase() + nextStatus.slice(1)}
-                                </button>
+                                <>
+                                  {nextStatus === "dispatched" && (
+                                    <input
+                                      className="tracking-input"
+                                      placeholder="Tracking # (optional)"
+                                      value={trackingInputs[o.id] || ""}
+                                      onChange={e => setTrackingInputs(prev => ({ ...prev, [o.id]: e.target.value }))}
+                                    />
+                                  )}
+                                  <button className="btn btn-sm order-btn-advance" onClick={() => updateOrderStatus(o.id, nextStatus, nextStatus === "dispatched" ? (trackingInputs[o.id] || undefined) : undefined)}>
+                                    ▶ {nextStatus.charAt(0).toUpperCase() + nextStatus.slice(1)}
+                                  </button>
+                                </>
                               )}
                               {!isNew && prevStatus && o.status !== "delivered" && (
                                 <button className="btn btn-sm order-btn-back" onClick={() => updateOrderStatus(o.id, prevStatus)}>
@@ -560,6 +583,10 @@ function Admin() {
                 <div className="form-group">
                   <label className="form-label">Weight / Size</label>
                   <input className="form-input" name="weight" placeholder="e.g. 100g, 250g, 500g" value={form.weight} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Stock Quantity</label>
+                  <input className="form-input" name="stock" type="number" min="0" placeholder="e.g. 50 (leave blank = unlimited)" value={form.stock} onChange={handleChange} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Category</label>

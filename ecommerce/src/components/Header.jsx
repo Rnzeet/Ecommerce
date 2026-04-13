@@ -9,6 +9,7 @@ import "./Header.css";
 const NAV_ITEMS = [
   { to: "/", label: "Home", exact: true },
   { to: "/products", label: "Products" },
+  // { to: "/track", label: "Track Order" },
   { to: "/about", label: "About" },
 ];
 
@@ -114,6 +115,7 @@ function Header() {
             <span className="header-username">
               {user.user_metadata?.full_name?.split(" ")[0] || "User"}
             </span>
+            {/* <Link to="/track" className="header-orders-btn" onClick={close}>Track Order</Link> */}
             <Link to="/orders" className="header-orders-btn" onClick={close}>My Orders</Link>
             <button className="header-signout-btn" onClick={handleSignOut}>Sign out</button>
           </div>

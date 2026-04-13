@@ -55,13 +55,13 @@ router.get("/", async (req, res) => {
 // POST /add-product -> add new product
 router.post("/add-product", async (req, res) => {
   try {
-    const { name, price, image, category, description, weight } = req.body;
+    const { name, price, image, category, description, weight, stock } = req.body;
     if (!name || price === undefined || price === "") {
       return res.status(400).json({ message: "Name and price are required" });
     }
     const { data, error } = await supabase
       .from("products")
-      .insert([{ name, price: parseFloat(price), image, category, description, weight: weight || null }])
+      .insert([{ name, price: parseFloat(price), image, category, description, weight: weight || null, stock: stock !== undefined && stock !== "" ? parseInt(stock) : null }])
       .select();
     if (error) return res.status(400).json({ message: error.message, details: error.details });
     res.json(data);
@@ -74,10 +74,10 @@ router.post("/add-product", async (req, res) => {
 router.put("/update-product/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, price, image, category, description, weight } = req.body;
+    const { name, price, image, category, description, weight, stock } = req.body;
     const { data, error } = await supabase
       .from("products")
-      .update({ name, price: parseFloat(price), image, category, description, weight: weight || null })
+      .update({ name, price: parseFloat(price), image, category, description, weight: weight || null, stock: stock !== undefined && stock !== "" ? parseInt(stock) : null })
       .eq("id", id)
       .select();
     if (error) return res.status(400).json({ message: error.message, details: error.details });

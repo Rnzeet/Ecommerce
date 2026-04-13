@@ -21,6 +21,25 @@ router.get("/my", async (req, res) => {
   }
 });
 
+// GET /api/orders/track?orderId=xxx&email=xxx  — public order tracking (no auth)
+router.get("/track", async (req, res) => {
+  const { orderId, email } = req.query;
+  if (!orderId || !email) return res.status(400).json({ message: "orderId and email are required" });
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("orders")
+      .select("id, razorpay_order_id, status, tracking_number, items, total_amount, created_at, customer_name, delivery_address")
+      .ilike("razorpay_order_id", `%${orderId.trim()}%`)
+      .ilike("customer_email", email.trim())
+      .maybeSingle();
+    if (error) return res.status(500).json({ message: error.message });
+    if (!data) return res.status(404).json({ message: "No order found with that ID and email." });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // GET /api/orders  — list all orders for admin dashboard
 router.get("/", async (req, res) => {
   try {
@@ -35,18 +54,20 @@ router.get("/", async (req, res) => {
   }
 });
 
-// PATCH /api/orders/:id/status  — update order status
+// PATCH /api/orders/:id/status  — update order status + optional tracking number
 router.patch("/:id/status", async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
+  const { status, tracking_number } = req.body;
   const VALID = ["paid", "received", "packed", "dispatched", "delivered"];
   if (!status || !VALID.includes(status)) {
     return res.status(400).json({ message: `Invalid status. Valid: ${VALID.join(", ")}` });
   }
   try {
+    const updates = { status };
+    if (tracking_number !== undefined) updates.tracking_number = tracking_number || null;
     const { data, error } = await supabaseAdmin
       .from("orders")
-      .update({ status })
+      .update(updates)
       .eq("id", id)
       .select()
       .single();

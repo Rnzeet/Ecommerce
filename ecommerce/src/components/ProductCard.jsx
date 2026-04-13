@@ -27,6 +27,12 @@ function ProductCard({ product }) {
         >
           {wishlisted ? "❤️" : "🤍"}
         </button>
+        {product.stock !== null && product.stock !== undefined && product.stock <= 5 && product.stock > 0 && (
+          <span className="low-stock-badge">Only {product.stock} left!</span>
+        )}
+        {product.stock === 0 && (
+          <span className="out-of-stock-badge">Out of Stock</span>
+        )}
       </div>
       <div className="card-content">
         {product.category && (
@@ -39,12 +45,13 @@ function ProductCard({ product }) {
           <span className="price"><span>₹</span>{product.price}</span>
           <button
             className="card-add-btn"
+            disabled={product.stock === 0}
             onClick={() => {
               addToCart(product);
               toast.success("Added to cart 🛒");
             }}
           >
-            Add to Cart
+            {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
           </button>
         </div>
       </div>
