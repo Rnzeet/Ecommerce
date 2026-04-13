@@ -44,8 +44,8 @@ function getCategoryIcon(name) {
 }
 
 const STATS = [
-  { value: "10K+", label: "Happy Customers" },
-  { value: "200+", label: "Tea Varieties" },
+  { value: "10+", label: "Happy Customers" },
+  { value: "20+", label: "Tea Varieties" },
   { value: "4.9★", label: "Average Rating" },
   { value: "Free", label: "Shipping Above ₹499" },
 ];
