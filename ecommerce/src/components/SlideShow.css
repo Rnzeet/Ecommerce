@@ -235,8 +235,9 @@
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .ss-root {
-    height: 70vh;
-    min-height: 380px;
+    height: 60vh;
+    min-height: 360px;
+    max-height: 540px;
   }
 
   .ss-arrow {
@@ -257,11 +258,15 @@
 
 @media (max-width: 480px) {
   .ss-root {
-    height: 55vh;
-    min-height: 300px;
+    height: 48vh;
+    min-height: 280px;
+    max-height: 420px;
   }
 
   .ss-arrow { display: none; }
 
   .ss-dots { bottom: 14px; }
+
+  .ss-dot { width: 6px; height: 6px; }
+  .ss-dot-active { width: 20px; }
 }

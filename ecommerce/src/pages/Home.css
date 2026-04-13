@@ -109,14 +109,15 @@
 .hero-section {
   position: relative;
   width: 100%;
-  min-height: 92vh;
   overflow: hidden;
 }
 
 .hero-section .ss-root,
 .hero-section > div:first-child {
   width: 100%;
-  height: 92vh !important;
+  height: 88vh !important;
+  min-height: 480px !important;
+  max-height: 860px !important;
 }
 
 .hero-overlay {
@@ -665,11 +666,11 @@
     max-width: 100%;
   }
 
-  .hero-section,
   .hero-section .ss-root,
   .hero-section > div:first-child {
-    height: 75vh !important;
-    min-height: 75vh;
+    height: 60vh !important;
+    min-height: 360px !important;
+    max-height: 540px !important;
   }
 
   .stats-strip {
@@ -699,6 +700,58 @@
 }
 
 @media (max-width: 480px) {
+  .hero-section .ss-root,
+  .hero-section > div:first-child {
+    height: 48vh !important;
+    min-height: 280px !important;
+    max-height: 420px !important;
+  }
+
+  .hero-overlay {
+    padding: 0 16px;
+    align-items: flex-end;
+    padding-bottom: 32px;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.82) 0%,
+      rgba(0, 0, 0, 0.4) 50%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+  }
+
+  .hero-content {
+    text-align: left;
+    max-width: 100%;
+  }
+
+  .hero-badge {
+    font-size: 11px;
+    padding: 4px 12px;
+    margin-bottom: 10px;
+  }
+
+  .hero-title {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+
+  .hero-subtitle {
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .hero-actions {
+    gap: 10px;
+    justify-content: flex-start;
+  }
+
+  .btn-primary,
+  .btn-outline {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+
   .stats-strip {
     grid-template-columns: repeat(2, 1fr);
   }
