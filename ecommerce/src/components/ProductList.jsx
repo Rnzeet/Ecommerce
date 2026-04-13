@@ -4,7 +4,7 @@ import axios from "axios";
 import "./ProductList.css";
 import ProductCard from "./ProductCard";
 
-function ProductList() {
+function ProductList({ limit }) {
   const [products, setProducts] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState(
@@ -43,10 +43,12 @@ function ProductList() {
     ? products
     : products.filter(p => p.category === activeCategory);
 
+  const displayed = limit ? filtered.slice(0, limit) : filtered;
+
   return (
     <div className="product-list-wrapper">
-      {/* Category Filter Tabs */}
-      {categories.length > 1 && (
+      {/* Category Filter Tabs — hidden when limit is set (e.g. home page) */}
+      {!limit && categories.length > 1 && (
         <div className="category-filter-bar">
           {categories.map(cat => (
             <button
@@ -62,9 +64,9 @@ function ProductList() {
 
       {/* Products Grid */}
       <div className="products-grid">
-        {filtered.length === 0 ? (
+        {displayed.length === 0 ? (
           <p className="no-products">No products in this category yet.</p>
-        ) : filtered.map((item) => (
+        ) : displayed.map((item) => (
           <ProductCard key={item.id} product={item} />
         ))}
       </div>
