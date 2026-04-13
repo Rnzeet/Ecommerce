@@ -1,0 +1,128 @@
+/* ── Products Page ── */
+.products-page {
+  min-height: 100vh;
+  background: #111820;
+}
+
+/* ── Hero Banner ── */
+.products-hero {
+  padding: clamp(120px, 14vw, 160px) clamp(20px, 6vw, 80px) clamp(48px, 6vw, 72px);
+  background: linear-gradient(180deg, #0a1628 0%, #111820 100%);
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.products-hero::before {
+  content: "🍵";
+  position: absolute;
+  font-size: 18rem;
+  opacity: 0.04;
+  right: -40px;
+  top: -20px;
+  pointer-events: none;
+  line-height: 1;
+}
+
+.products-hero-tag {
+  display: inline-block;
+  background: rgba(56, 142, 60, 0.15);
+  color: #81c784;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(129, 199, 132, 0.3);
+}
+
+.products-hero-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0 0 14px;
+  line-height: 1.15;
+}
+
+.products-hero-sub {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0 0 36px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+/* ── Search Bar ── */
+.products-search-wrap {
+  position: relative;
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.products-search-icon {
+  position: absolute;
+  left: 18px;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.products-search-input {
+  width: 100%;
+  padding: 14px 48px 14px 48px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  color: #ffffff;
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.products-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.products-search-input:focus {
+  border-color: #43a047;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.products-search-clear {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 50%;
+  transition: color 0.2s, background 0.2s;
+}
+
+.products-search-clear:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: transparent;
+}
+
+/* ── Body ── */
+.products-body {
+  padding: 40px clamp(16px, 5vw, 60px) 20px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+  .products-hero {
+    padding-top: 100px;
+  }
+}

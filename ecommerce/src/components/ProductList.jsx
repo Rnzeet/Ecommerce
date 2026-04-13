@@ -4,7 +4,7 @@ import axios from "axios";
 import "./ProductList.css";
 import ProductCard from "./ProductCard";
 
-function ProductList({ limit }) {
+function ProductList({ limit, search = "" }) {
   const [products, setProducts] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState(
@@ -44,7 +44,15 @@ function ProductList({ limit }) {
     ? products
     : products.filter(p => p.category === activeCategory);
 
-  const displayed = limit ? filtered.slice(0, limit) : filtered;
+  const searched = search.trim()
+    ? filtered.filter(p =>
+        (p.title || p.name || "").toLowerCase().includes(search.toLowerCase()) ||
+        (p.description || "").toLowerCase().includes(search.toLowerCase()) ||
+        (p.category || "").toLowerCase().includes(search.toLowerCase())
+      )
+    : filtered;
+
+  const displayed = limit ? searched.slice(0, limit) : searched;
 
   return (
     <div className="product-list-wrapper">
@@ -64,6 +72,11 @@ function ProductList({ limit }) {
       )}
 
       {/* Products Grid */}
+      {search && (
+        <p className="search-results-count">
+          {displayed.length} result{displayed.length !== 1 ? "s" : ""} for "<strong>{search}</strong>"
+        </p>
+      )}
       <div className="products-grid">
         {displayed.length === 0 ? (
           <p className="no-products">No products in this category yet.</p>
