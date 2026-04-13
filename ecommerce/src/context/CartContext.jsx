@@ -79,12 +79,13 @@ export function CartProvider({ children }) {
         setCouponCode("");
         setCouponMsg({ type: "success", text: `"${res.data.code}" applied — you save ₹${saving.toFixed(0)}!` });
       } else {
+      
         setDiscount(0);
         setCouponApplied("");
         setCouponMsg({ type: "error", text: res.data.message || "Invalid coupon code" });
       }
     } catch {
-      setCouponMsg({ type: "error", text: "Could not validate coupon. Try again." });
+      setCouponMsg({ type: "error", text: "Could not validate coupon. Try again. / Login required to use this coupon" });
     }
   };
 

@@ -6,6 +6,63 @@
   font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
 }
 
+/* ── Coupon Offer Banner ── */
+.coupon-offer-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 1.5px dashed #86efac;
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  margin-bottom: 6px;
+  transition: background 0.2s, border-color 0.2s;
+}
+.coupon-offer-banner:hover {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-color: #4ade80;
+}
+.coupon-offer-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.coupon-offer-tag {
+  background: #16a34a;
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.coupon-offer-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #15803d;
+  margin: 0 0 2px;
+}
+.coupon-offer-sub {
+  font-size: 12px;
+  color: #16a34a;
+  margin: 0;
+}
+.coupon-offer-code {
+  font-size: 15px;
+  font-weight: 900;
+  color: #15803d;
+  letter-spacing: 2px;
+  background: white;
+  border: 1.5px dashed #86efac;
+  border-radius: 8px;
+  padding: 6px 12px;
+  flex-shrink: 0;
+}
+
 .cart-header {
   display: flex;
   align-items: center;

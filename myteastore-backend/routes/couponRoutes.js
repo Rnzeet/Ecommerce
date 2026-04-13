@@ -3,13 +3,7 @@ const { supabase } = require("../config/supabase");
 
 const router = express.Router();
 
-// Static coupons (client-validated, no DB needed)
-const STATIC_COUPONS = {
-  TEA10: { discount: 0.10, label: "10% off" },
-  SAVE20: { discount: 0.20, label: "20% off" },
-};
-
-// DB-backed one-time coupon
+// One-time coupons — checked against DB per user
 const ONE_TIME_COUPONS = {
   NEW10: { discount: 0.10, label: "10% off for new users" },
 };
@@ -22,16 +16,10 @@ router.post("/validate", async (req, res) => {
 
     const upper = code.trim().toUpperCase();
 
-    // Static coupons
-    if (STATIC_COUPONS[upper]) {
-      return res.json({ valid: true, discount: STATIC_COUPONS[upper].discount, code: upper });
-    }
-
-    // One-time coupons — require email
     if (ONE_TIME_COUPONS[upper]) {
       if (!userEmail) return res.status(400).json({ valid: false, message: "Login required to use this coupon" });
 
-      // Check if already used
+      // Check if coupon already used
       const { data: existing } = await supabase
         .from("coupon_usage")
         .select("id")
@@ -41,6 +29,18 @@ router.post("/validate", async (req, res) => {
 
       if (existing) {
         return res.json({ valid: false, message: "You have already used this coupon" });
+      }
+
+      // Check if user has already placed any order
+      const { data: priorOrder } = await supabase
+        .from("orders")
+        .select("id")
+        .eq("customer_email", userEmail.toLowerCase())
+        .limit(1)
+        .maybeSingle();
+
+      if (priorOrder) {
+        return res.json({ valid: false, message: "NEW10 is only for first-time orders" });
       }
 
       return res.json({ valid: true, discount: ONE_TIME_COUPONS[upper].discount, code: upper });

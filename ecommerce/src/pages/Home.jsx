@@ -135,31 +135,16 @@ function AnimatedCounter({ target }) {
 function Home() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("myteastore_categories") || "[]");
-    if (stored.length > 0) setCategories(stored);
-
-    axios.get(`${API}/api/products`).then(res => {
-      const list = Array.isArray(res.data) ? res.data : [];
-      const fromProducts = [...new Set(list.map(p => p.category).filter(Boolean))];
-      if (fromProducts.length > 0) {
-        const merged = [...new Set([...stored, ...fromProducts])];
-        setCategories(merged);
-        localStorage.setItem("myteastore_categories", JSON.stringify(merged));
-      }
-    }).catch(() => {});
+    axios.get(`${API}/api/categories`).then(res => {
+      const names = (res.data || []).map(c => c.name).filter(Boolean);
+      setCategories(names);
+    }).catch(() => {
+      const stored = JSON.parse(localStorage.getItem("myteastore_categories") || "[]");
+      setCategories(stored);
+    });
   }, []);
-
-  const handleSubscribe = (e) => {
-    e.preventDefault();
-    if (email.trim()) {
-      setSubscribed(true);
-      setEmail("");
-    }
-  };
 
   return (
     <div className="home-root">
@@ -303,27 +288,37 @@ function Home() {
         </div>
       </section>
 
-      {/* ── NEWSLETTER ── */}
-      <section className="newsletter-section">
-        <div className="newsletter-inner">
-          <span className="newsletter-icon">📬</span>
-          <h2 className="newsletter-title">Get 10% Off Your First Order</h2>
-          <p className="newsletter-sub">Subscribe to our newsletter for exclusive deals, brewing tips, and new arrivals.</p>
-          {subscribed ? (
-            <p className="newsletter-success">🎉 Thank you! Your discount code has been sent to your email.</p>
-          ) : (
-            <form className="newsletter-form" onSubmit={handleSubscribe}>
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                className="newsletter-input"
-              />
-              <button type="submit" className="btn-primary">Subscribe</button>
-            </form>
-          )}
+      {/* ── COUPON BANNER ── */}
+      <section className="coupon-section">
+        <div className="coupon-section-inner">
+          <div className="coupon-section-left">
+            <span className="coupon-section-tag">🎁 EXCLUSIVE OFFER</span>
+            <h2 className="coupon-section-title">10% Off Your First Order</h2>
+            <p className="coupon-section-sub">New to TeaStore? Use the code below at checkout and save on your first purchase. One-time use per account.</p>
+            <button className="btn-primary" onClick={() => navigate("/products")} style={{ marginTop: 8 }}>
+              Shop Now & Save
+            </button>
+          </div>
+          <div className="coupon-section-right">
+            <div className="coupon-card">
+              <div className="coupon-card-top">
+                <span className="coupon-card-brand">🍵 MyTeaStore</span>
+                <span className="coupon-card-discount">10% OFF</span>
+              </div>
+              <div className="coupon-card-divider">
+                <span className="coupon-card-dot coupon-card-dot-left" />
+                <div className="coupon-card-dashes" />
+                <span className="coupon-card-dot coupon-card-dot-right" />
+              </div>
+              <div className="coupon-card-bottom">
+                <p className="coupon-card-label">Use code at checkout</p>
+                <div className="coupon-card-code-wrap">
+                  <span className="coupon-card-code">NEW10</span>
+                </div>
+                <p className="coupon-card-terms">Valid for first-time orders only</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

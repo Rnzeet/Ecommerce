@@ -68,7 +68,20 @@ function Cart() {
 
           {/* Coupon */}
           <div className="summary-card">
-            <h3 className="summary-section-title">Coupon Code</h3>
+            {/* NEW10 offer banner */}
+            {!couponApplied && !user?.hasOrdered && (
+              <div className="coupon-offer-banner" onClick={() => { setCouponCode("NEW10"); }}>
+                <div className="coupon-offer-left">
+                  <span className="coupon-offer-tag">NEW USER</span>
+                  <div>
+                    <p className="coupon-offer-title">10% off your first order</p>
+                    <p className="coupon-offer-sub">Use code <strong>NEW10</strong> at checkout</p>
+                  </div>
+                </div>
+                <span className="coupon-offer-code">NEW10</span>
+              </div>
+            )}
+            <h3 className="summary-section-title" style={{ marginTop: couponApplied ? 0 : 14 }}>Coupon Code</h3>
             {couponApplied ? (
               <div className="coupon-applied-row">
                 <span className="coupon-applied-badge">✅ {couponApplied}</span>
