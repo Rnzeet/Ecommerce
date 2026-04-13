@@ -10,6 +10,7 @@ const orderRoutes = require("./routes/orderRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const couponRoutes = require("./routes/couponRoutes");
 const contactRoutes = require("./routes/contactRoutes");
+const chatRoutes = require("./routes/chatRoutes");
 const authRoutes = require("./models/auth");
 
 const app = express();
@@ -27,6 +28,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/chat", chatRoutes);
 app.use("/auth", authRoutes);
 
 app.get("/", (req, res) => {
