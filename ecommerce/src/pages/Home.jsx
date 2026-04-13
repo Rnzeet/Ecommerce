@@ -254,7 +254,6 @@ function Home() {
               >
                 <div className="cat-emoji">{getCategoryIcon(cat)}</div>
                 <p className="cat-label">{cat}</p>
-                <span className="cat-arrow">Shop →</span>
               </div>
             ))}
           </div>
