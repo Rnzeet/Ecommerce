@@ -7,6 +7,7 @@ const path = require("path");
 const productRoutes = require("./routes/productRoutes");
 const bannerRoutes = require("./routes/bannerRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
 const authRoutes = require("./models/auth");
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(express.json({ limit: "10mb" }));
 app.use("/api/products", productRoutes);
 app.use("/api/banners", bannerRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/categories", categoryRoutes);
 app.use("/auth", authRoutes);
 
 app.get("/", (req, res) => {

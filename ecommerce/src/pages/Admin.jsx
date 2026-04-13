@@ -5,7 +5,7 @@ import axios from "axios";
 import "./Admin.css";
 
 const API = import.meta.env.VITE_API_URL;
-const CATEGORIES_KEY = "myteastore_categories";
+
 
 function Admin() {
   const navigate = useNavigate();
@@ -23,11 +23,7 @@ function Admin() {
   const [bannerFile, setBannerFile] = useState(null);
   const [bannerPreview, setBannerPreview] = useState(null);
   const [bannerUploading, setBannerUploading] = useState(false);
-  const [categories, setCategories] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem(CATEGORIES_KEY)) || [];
-    } catch { return []; }
-  });
+  const [categories, setCategories] = useState([]);
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [form, setForm] = useState({
@@ -42,21 +38,22 @@ function Admin() {
   const fetchProducts = async () => {
     try {
       const res = await axios.get(`${API}/api/products`);
-      const list = Array.isArray(res.data) ? res.data : [];
-      setProducts(list);
-      // Auto-sync categories from existing products
-      setCategories(prev => {
-        const fromProducts = list.map(p => p.category).filter(Boolean);
-        const merged = [...new Set([...prev, ...fromProducts])];
-        localStorage.setItem(CATEGORIES_KEY, JSON.stringify(merged));
-        return merged;
-      });
+      setProducts(Array.isArray(res.data) ? res.data : []);
     } catch {
       showToast("Failed to fetch products", "error");
     }
   };
 
-  useEffect(() => { fetchProducts(); fetchBanners(); fetchOrders(); }, []);
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get(`${API}/api/categories`);
+      setCategories((res.data || []).map(c => c.name));
+    } catch {
+      // silent
+    }
+  };
+
+  useEffect(() => { fetchProducts(); fetchBanners(); fetchOrders(); fetchCategories(); }, []);
 
   const fetchOrders = async () => {
     setOrdersLoading(true);
@@ -198,30 +195,32 @@ function Admin() {
     }
   };
 
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
     const trimmed = newCategory.trim();
     if (!trimmed) return;
-    if (categories.map(c => c.toLowerCase()).includes(trimmed.toLowerCase())) {
-      showToast("Category already exists", "error");
-      return;
+    try {
+      await axios.post(`${API}/api/categories`, { name: trimmed });
+      setNewCategory("");
+      showToast(`Category "${trimmed}" added`);
+      fetchCategories();
+    } catch (err) {
+      showToast(err.response?.data?.message || "Failed to add category", "error");
     }
-    const updated = [...categories, trimmed];
-    setCategories(updated);
-    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(updated));
-    setNewCategory("");
-    showToast(`Category "${trimmed}" added`);
   };
 
-  const handleDeleteCategory = (cat) => {
+  const handleDeleteCategory = async (cat) => {
     const usedBy = products.filter(p => p.category === cat).length;
     if (usedBy > 0) {
       showToast(`Cannot delete — ${usedBy} product(s) use this category`, "error");
       return;
     }
-    const updated = categories.filter(c => c !== cat);
-    setCategories(updated);
-    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(updated));
-    showToast(`Category "${cat}" removed`);
+    try {
+      await axios.delete(`${API}/api/categories/${encodeURIComponent(cat)}`);
+      showToast(`Category "${cat}" removed`);
+      fetchCategories();
+    } catch (err) {
+      showToast(err.response?.data?.message || "Failed to delete category", "error");
+    }
   };
 
   const handleLogout = () => {
