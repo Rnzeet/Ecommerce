@@ -76,6 +76,10 @@ function Checkout() {
 
   const handlePayment = async () => {
     if (cart.length === 0) { setError("Your cart is empty."); return; }
+    if (!RZP_KEY) {
+      setError("Payment configuration error: Razorpay key is missing. Please contact support.");
+      return;
+    }
     setLoading(true);
     setError("");
 
