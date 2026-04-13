@@ -1,9 +1,4 @@
 {
-  "build": {
-    "env": {
-      "VITE_API_URL": "https://ecommerce-19y4.onrender.com"
-    }
-  },
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
   ]
