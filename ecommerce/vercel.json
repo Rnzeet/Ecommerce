@@ -1,4 +1,12 @@
 {
+  "build": {
+    "env": {
+      "VITE_API_URL": "https://ecommerce-19y4.onrender.com",
+      "VITE_RAZORPAY_KEY_ID": "rzp_test_Sbj0MhwkCstaHG",
+      "VITE_SUPABASE_URL": "https://nolpyyvnwyvzqyhkcsct.supabase.co",
+      "VITE_SUPABASE_ANON_KEY": "sb_publishable_JfGUtUuc04-RGApJQbEX5g_Bqf9M40G"
+    }
+  },
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
   ]
