@@ -15,7 +15,8 @@ function ProductList({ limit }) {
 
   const fetchProducts = async () => {
     const res = await axios.get(`${API}/api/products`);
-    const fetchedProducts = res.data.map(p => ({ ...p, title: p.name }));
+    const list = Array.isArray(res.data) ? res.data : [];
+    const fetchedProducts = list.map(p => ({ ...p, title: p.name }));
     setProducts(fetchedProducts);
   };
 

@@ -42,10 +42,11 @@ function Admin() {
   const fetchProducts = async () => {
     try {
       const res = await axios.get(`${API}/api/products`);
-      setProducts(res.data);
+      const list = Array.isArray(res.data) ? res.data : [];
+      setProducts(list);
       // Auto-sync categories from existing products
       setCategories(prev => {
-        const fromProducts = res.data.map(p => p.category).filter(Boolean);
+        const fromProducts = list.map(p => p.category).filter(Boolean);
         const merged = [...new Set([...prev, ...fromProducts])];
         localStorage.setItem(CATEGORIES_KEY, JSON.stringify(merged));
         return merged;

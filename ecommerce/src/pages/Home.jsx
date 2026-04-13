@@ -143,7 +143,8 @@ function Home() {
     if (stored.length > 0) setCategories(stored);
 
     axios.get(`${API}/api/products`).then(res => {
-      const fromProducts = [...new Set(res.data.map(p => p.category).filter(Boolean))];
+      const list = Array.isArray(res.data) ? res.data : [];
+      const fromProducts = [...new Set(list.map(p => p.category).filter(Boolean))];
       if (fromProducts.length > 0) {
         const merged = [...new Set([...stored, ...fromProducts])];
         setCategories(merged);
