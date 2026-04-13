@@ -15,6 +15,7 @@ function ProductCard({ product }) {
         )}
         <h3>{product.title}</h3>
         <p>{product.description}</p>
+        {product.weight && <span className="product-weight">{product.weight}</span>}
         <div className="price-section">
           <span className="price"><span>₹</span>{product.price}</span>
           <button

@@ -31,7 +31,7 @@ function Admin() {
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [form, setForm] = useState({
-    name: "", price: "", image: "", category: "", description: "", imageName: "",
+    name: "", price: "", image: "", category: "", description: "", imageName: "", weight: "",
   });
 
   const showToast = (message, type = "success") => {
@@ -137,7 +137,7 @@ function Admin() {
   };
 
   const resetForm = () => {
-    setForm({ name: "", price: "", image: "", category: "", description: "", imageName: "" });
+    setForm({ name: "", price: "", image: "", category: "", description: "", imageName: "", weight: "" });
     setImageFile(null);
     setImagePreview(null);
     setEditId(null);
@@ -161,7 +161,7 @@ function Admin() {
       }
       const payload = {
         name: form.name, price: form.price, image: imageUrl,
-        category: form.category, description: form.description,
+        category: form.category, description: form.description, weight: form.weight,
       };
       if (editId) {
         await axios.put(`${API}/api/products/update-product/${editId}`, payload);
@@ -180,7 +180,7 @@ function Admin() {
   };
 
   const handleEdit = (p) => {
-    setForm({ name: p.name, price: p.price, image: p.image, category: p.category, description: p.description || "", imageName: "" });
+    setForm({ name: p.name, price: p.price, image: p.image, category: p.category, description: p.description || "", imageName: "", weight: p.weight || "" });
     setImagePreview(p.image || null);
     setEditId(p.id);
     setActiveTab("products");
@@ -557,6 +557,10 @@ function Admin() {
                 <div className="form-group">
                   <label className="form-label">Price (₹) *</label>
                   <input className="form-input" name="price" type="number" placeholder="e.g. 299" value={form.price} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Weight / Size</label>
+                  <input className="form-input" name="weight" placeholder="e.g. 100g, 250g, 500g" value={form.weight} onChange={handleChange} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Category</label>
