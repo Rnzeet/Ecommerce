@@ -4,7 +4,7 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import "./OrderHistory.css";
 
-const API = import.meta.env.VITE_API_URL || "https://ecommerce-19y4.onrender.com";
+const API = import.meta.env.VITE_API_URL
 
 const STATUS_STEPS = ["paid", "received", "packed", "dispatched", "delivered"];
 
