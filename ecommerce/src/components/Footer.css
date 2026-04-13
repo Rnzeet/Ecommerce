@@ -23,11 +23,16 @@
 
 .footer-section ul li {
   margin-bottom: 8px;
-  cursor: pointer;
 }
 
-.footer-section ul li:hover {
-  color: #facc15;
+.footer-section ul li a {
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-section ul li a:hover {
+  color: #81c784;
 }
 
 .social-icons {

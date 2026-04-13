@@ -10,6 +10,8 @@ import Products from "./pages/Products";
 import Admin from "./pages/Admin";
 import AdminLogin from "./pages/AdminLogin";
 import Login from "./pages/Login";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 import OrderHistory from "./pages/OrderHistory";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -30,6 +32,8 @@ function AppContent() {
           <Route path="/products" element={<Products />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/orders" element={<OrderHistory />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/admin-login" element={<AdminLogin />} />
