@@ -21,7 +21,9 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json({ limit: "10mb" }));
-
+app.get("/ping", (req, res) => {
+  res.send("OK");
+});
 app.use("/api/products", productRoutes);
 app.use("/api/banners", bannerRoutes);
 app.use("/api/orders", orderRoutes);
